@@ -7,7 +7,10 @@ import { MoveLeft } from 'lucide-react';
 import { AreaT, CitizenResponseT, CitizenT } from '@/types/general';
 import { useMemo, useState } from 'react';
 import { useForm } from '@inertiajs/react';
+import ReactPDF, { PDFViewer } from '@react-pdf/renderer';
+import Ticket from '@/components/ticket';
 
+import { PrintPDF } from '../../lib/print';
 type props = {
     areas: AreaT[];
 };
@@ -59,6 +62,8 @@ export default function TicketGenerator({ areas }: props) {
     const [screen, setScreen] = useState<ScreenT>('search-citizen');
     const { data, setData, post } =
         useForm<Required<TicketGeneratorFormDataT>>(initData);
+
+    const [ticketData, setTicketData] = useState<any>(null);
 
     const [selectedAreas, setSelectedAreas] = useState<{
         gerencia: AreaT;
@@ -135,7 +140,14 @@ export default function TicketGenerator({ areas }: props) {
                 break;
             case 'confirm':
                 post(route('ticket-generator.store'), {
-                    onSuccess: () => {},
+                    onSuccess: (data) => {
+                        setTicketData(data.props.ticketGenerated);
+                        PrintPDF(
+                            <Ticket
+                                ticketData={data.props.ticketGenerated}
+                            ></Ticket>,
+                        );
+                    },
                 });
                 setScreen('search-citizen');
                 setData(initData);

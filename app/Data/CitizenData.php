@@ -14,15 +14,15 @@ class CitizenData extends Data
         public string $names,
         #[Required]
         public string $first_surname,
-        #[Required]
-        public string $second_surname,
-        #[Required]
-        public string $departament,
-        #[Required]
-        public string $province,
-        #[Required]
-        public string $district,
-        #[Required]
-        public string $address,
+
+        public ?string $second_surname  = null,
+
+        public ?string $departament  = null,
+
+        public ?string $province  = null,
+
+        public ?string $district  = null,
+
+        public ?string $address  = null,
     ) {}
 }
