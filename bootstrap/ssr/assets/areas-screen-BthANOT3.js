@@ -1,8 +1,7 @@
 import { jsxs, jsx } from "react/jsx-runtime";
-import BoxContent from "./box-content-epwYYoJF.js";
-import "./utils-MEMCRJMC.js";
+import BoxContent from "./box-content-IpGNEwbo.js";
+import "./utils-RoOYjAmh.js";
 import "clsx";
-import "tailwind-merge";
 function AreasScreen({
   areas,
   setScreen,
@@ -18,7 +17,7 @@ function AreasScreen({
         BoxContent,
         {
           area,
-          className: "text-xl text-custom-900 ",
+          className: "text-2xl",
           screen,
           setScreen,
           setSelectedAreas,

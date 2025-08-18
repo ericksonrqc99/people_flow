@@ -1768,10 +1768,6 @@
     <div class="h-14.5 hidden lg:block"></div>
     @endif
 
-    <script>
-        window.print();
-    </script>
-
 </body>
 
 </html>

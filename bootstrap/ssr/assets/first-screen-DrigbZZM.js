@@ -1,29 +1,43 @@
 import { jsxs, jsx } from "react/jsx-runtime";
-import { s as searchCitizenByDni } from "./citizen-ujNgKD5J.js";
-import { c as capitalizeFirstLetter } from "./utils-MEMCRJMC.js";
+import axios from "axios";
+import { a as capitalizeFirstLetter } from "./utils-RoOYjAmh.js";
 import { useState } from "react";
-import "axios";
 import "clsx";
-import "tailwind-merge";
+const searchCitizenByDni = async (dni) => {
+  const response = await axios.get(
+    route("citizen.search-citizen-by-dni", {
+      dni
+    }),
+    {
+      withCredentials: true
+    }
+  );
+  return response.data;
+};
 function FirstScreen({ setData, data }) {
-  var _a;
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   const handleOnChangeInput = async (e) => {
     const value = e.target.value;
     if (isNaN(Number(value))) return;
     if (value.length <= 8 && value.length >= 0) {
       setData({
         ...data,
-        citizen: { ...data.citizen, numeroDocumento: value }
+        citizen: { ...data.citizen, dni: value }
       });
     }
-    if (value.length === 8) {
+    if (value.length === 8 && value !== "00000000") {
       try {
+        setError("");
         setIsLoading(true);
         const response = await searchCitizenByDni(value);
         setIsLoading(false);
-        setData({ ...data, citizen: { ...response } });
-      } catch (error) {
+        if (response.ok) {
+          setData({ ...data, citizen: { ...response } });
+          return;
+        }
+        setError(response.message);
+      } catch (error2) {
         setIsLoading(false);
       }
     }
@@ -45,26 +59,24 @@ function FirstScreen({ setData, data }) {
           onChange: (e) => {
             handleOnChangeInput(e);
           },
-          value: (_a = data.citizen) == null ? void 0 : _a.numeroDocumento,
+          value: data.citizen.dni,
           autoFocus: true,
           type: "text",
           placeholder: "Ingresa tu DNI",
           className: "shadow-inner  text-center text-4xl h-14 border-1 border-custom-input-border rounded-md"
         }
       ),
-      /* @__PURE__ */ jsx("div", { className: "h-14", children: isLoading ? /* @__PURE__ */ jsx("div", { className: "text-center", children: /* @__PURE__ */ jsx("span", { className: "loader" }) }) : data.citizen.ok && /* @__PURE__ */ jsxs("p", { className: "text-3xl text-center font-semibold text-custom-900", children: [
+      /* @__PURE__ */ jsx("div", { className: "h-14", children: isLoading ? /* @__PURE__ */ jsx("div", { className: "text-center", children: /* @__PURE__ */ jsx("span", { className: "loader" }) }) : data.citizen.ok ? /* @__PURE__ */ jsxs("p", { className: "text-3xl text-center font-semibold text-custom-900", children: [
+        capitalizeFirstLetter(data.citizen.names),
+        " ",
         capitalizeFirstLetter(
-          data.citizen.nombres
+          data.citizen.first_surname
         ),
         " ",
         capitalizeFirstLetter(
-          data.citizen.apellidoPaterno
-        ),
-        " ",
-        capitalizeFirstLetter(
-          data.citizen.apellidoMaterno
+          data.citizen.second_surname
         )
-      ] }) })
+      ] }) : error && /* @__PURE__ */ jsx("p", { className: "text-xl text-center text-red-500 font-semibold", children: error }) })
     ] }) })
   ] });
 }

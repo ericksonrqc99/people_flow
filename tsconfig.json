@@ -119,6 +119,6 @@
         "resources/js/**/*.d.ts",
         "resources/js/**/*.tsx",
         "./env.d.ts"
-    ],
+, "resources/js/lib/echo-react.js"    ],
     "types": ["vite/client"]
 }

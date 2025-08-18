@@ -3,7 +3,10 @@
 namespace App\Http\Requests;
 
 use App\Models\Area;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
 class StoreTicketRequest extends FormRequest
@@ -34,7 +37,7 @@ class StoreTicketRequest extends FormRequest
             'area.type_id' => ['nullable', 'integer', Rule::exists('types', 'id')->where('model', Area::class)],
 
             'citizen' => 'required|array',
-            'citizen.document_number' => 'required|integer|min:7|max:9',
+            'citizen.document_number' => 'required|digits_between:7,10',
             'citizen.names' => 'required|string|max:100',
             'citizen.first_surname' => 'required|string|max:100',
             'citizen.second_surname' => 'string|max:100',
@@ -42,7 +45,22 @@ class StoreTicketRequest extends FormRequest
             'citizen.province' => 'required|string|max:100',
             'citizen.district' => 'required|string|max:100',
             'citizen.address' => 'required|string|max:100',
-            'citizen.is_active' => 'required|boolean'
         ];
+    }
+
+
+
+
+    protected function failedValidation(Validator $validator)
+    {
+        dd($validator->errors()->toArray());
+        dd($this->all());
+
+        Log::warning('Validation Failed StoreTicketRequest', [
+            'user_id' => Auth::id(),
+            'ip' => request()->ip(),
+            'input' => request()->all(),
+            'errors' => $validator->errors()->toArray()
+        ]);
     }
 }

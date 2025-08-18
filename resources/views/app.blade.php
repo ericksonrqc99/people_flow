@@ -14,5 +14,8 @@
 
 <body>
     @inertia
+    @vite('resources/js/lib/echo-react.js')
+
 </body>
+
 </html>

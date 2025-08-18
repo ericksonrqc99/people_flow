@@ -4,13 +4,10 @@ import AreasScreen from './components/areas-screen';
 import ConfirmScreen from './components/confirm-screen';
 import { TicketGeneratorFormDataT } from './types';
 import { MoveLeft } from 'lucide-react';
-import { AreaT, CitizenResponseT, CitizenT } from '@/types/general';
+import { AreaT, CitizenT } from '@/types/general';
 import { useMemo, useState } from 'react';
 import { useForm } from '@inertiajs/react';
-import ReactPDF, { PDFViewer } from '@react-pdf/renderer';
-import Ticket from '@/components/ticket';
 
-import { PrintPDF } from '../../lib/print';
 type props = {
     areas: AreaT[];
 };
@@ -41,7 +38,7 @@ const initData: { citizen: CitizenT; area: AreaT } = {
         names: '',
         first_surname: '',
         second_surname: '',
-        dni: '',
+        document_number: '',
         address: '',
         departamet: '',
         district: '',
@@ -139,14 +136,11 @@ export default function TicketGenerator({ areas }: props) {
                 setScreen('confirm');
                 break;
             case 'confirm':
+                console.log({ data });
+
                 post(route('ticket-generator.store'), {
                     onSuccess: (data) => {
                         setTicketData(data.props.ticketGenerated);
-                        PrintPDF(
-                            <Ticket
-                                ticketData={data.props.ticketGenerated}
-                            ></Ticket>,
-                        );
                     },
                 });
                 setScreen('search-citizen');

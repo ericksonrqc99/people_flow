@@ -1,7 +1,6 @@
 import { jsx } from "react/jsx-runtime";
-import { c as capitalizeFirstLetter } from "./utils-MEMCRJMC.js";
+import { c as capitalizeFirstLetterOnly } from "./utils-RoOYjAmh.js";
 import "clsx";
-import "tailwind-merge";
 function BoxContent({
   area,
   className,
@@ -53,8 +52,8 @@ function BoxContent({
     {
       onClick: handleOnClick,
       onDoubleClick: handleOnDoubleClick,
-      className: `bg-custom-muted  px-2 min-h-40  py-4 flex items-center justify-center rounded-md hover:bg-custom-200 cursor-pointer border-4  border-transparent ${className} shadow-lg ${setStyles() && "border-4 border-dashed !border-black"}`,
-      children: /* @__PURE__ */ jsx("h3", { className: "text-center", children: capitalizeFirstLetter(area.short_name) })
+      className: `bg-custom-muted px-2 min-h-40  py-4 flex items-center justify-center rounded-md hover:bg-custom-200 cursor-pointer border-4  border-transparent ${className} shadow-lg ${setStyles() && "border-4 border-dashed !border-black"}`,
+      children: /* @__PURE__ */ jsx("h3", { className: "text-center font-semibold", children: capitalizeFirstLetterOnly(area.short_name) })
     }
   );
 }

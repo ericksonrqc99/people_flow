@@ -32,6 +32,7 @@ class Area extends Model
     {
         return $this->hasMany(Area::class, 'parent_id');
     }
+    
     public function type()
     {
         return $this->belongsTo(Type::class);

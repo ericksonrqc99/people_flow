@@ -35,7 +35,7 @@ class UserResource extends Resource
                     ->required(),
                 Forms\Components\Fieldset::make('Datos del usuario')->schema([
                     Forms\Components\TextInput::make('name')
-                        ->label(__('Nombre'))
+                        ->label(__('Nombre Completo'))
                         ->required()
                         ->maxLength(255),
                     Forms\Components\TextInput::make('email')
@@ -76,6 +76,7 @@ class UserResource extends Resource
                     ->badge()
                     ->color('warning')
                     ->numeric()
+                    ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('is_active')
                     ->label(__('Estado'))
@@ -89,10 +90,12 @@ class UserResource extends Resource
                         1 => 'activo'
                     }),
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('Creado'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
+                    ->label(__('Actualizado'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

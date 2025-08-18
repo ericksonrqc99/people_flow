@@ -12,4 +12,10 @@ class AreaService
     {
         return  Area::with('children')->where('is_active', '=', '1')->get();
     }
+
+
+    public static function getAreaById(int $areaId)
+    {
+        return Area::find($areaId);
+    }
 }

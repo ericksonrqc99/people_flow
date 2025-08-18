@@ -45,7 +45,16 @@ class AreaResource extends Resource
                                         ->readOnly(),
                                     Forms\Components\Select::make('type_id')
                                         ->label(__('Tipo'))
-                                        ->relationship('type', 'type')
+                                        ->relationship(
+                                            name: 'type',
+                                            titleAttribute: 'type',
+                                            modifyQueryUsing: fn(Builder $query) => $query
+                                                ->whereHas(
+                                                    'area',
+                                                    fn($q) =>
+                                                    $q->where('model', Area::class)
+                                                ),
+                                        )
                                         ->required()
                                         ->columnSpanFull(),
                                     Forms\Components\TextInput::make('name')

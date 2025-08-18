@@ -1,17 +1,99 @@
 import { jsx, jsxs } from "react/jsx-runtime";
-import { G as GuestLayout } from "./guest-layout-t0v6R3w2.js";
-import FirstScreen from "./first-screen-D1mKpitX.js";
+import FirstScreen from "./first-screen-DrigbZZM.js";
+import AreasScreen from "./areas-screen-BthANOT3.js";
+import ConfirmScreen from "./confirm-screen-Cs15LZbZ.js";
 import { MoveLeft } from "lucide-react";
 import { useState, useMemo } from "react";
 import { useForm } from "@inertiajs/react";
-import AreasScreen from "./areas-screen-Cx1uaWdY.js";
-import ConfirmScreen from "./confirm-screen-KFWdbNrr.js";
-import "./citizen-ujNgKD5J.js";
+import { Document, Page, StyleSheet, View, Text, pdf } from "@react-pdf/renderer";
+import qz from "qz-tray";
 import "axios";
-import "./utils-MEMCRJMC.js";
+import "./utils-RoOYjAmh.js";
 import "clsx";
-import "tailwind-merge";
-import "./box-content-epwYYoJF.js";
+import "./box-content-IpGNEwbo.js";
+function GuestLayout({
+  children,
+  className,
+  ...props
+}) {
+  return /* @__PURE__ */ jsx(
+    "main",
+    {
+      className: `bg-stone-100 h-screen w-screen ${className}`,
+      ...props,
+      children
+    }
+  );
+}
+const styles = StyleSheet.create({
+  page: {
+    flexDirection: "row",
+    backgroundColor: "#E4E4E4"
+  },
+  section: {
+    margin: 10,
+    padding: 10,
+    flexGrow: 1,
+    textAlign: "center"
+  },
+  centeredText: {
+    textAlign: "center"
+  },
+  code: { padding: "2 0", fontWeight: "bold" },
+  area: { padding: "2 0" },
+  date: { fontSize: 10, margin: "10 0 0 0" },
+  title: { fontSize: 10 }
+});
+function Ticket({ ticketData }) {
+  return /* @__PURE__ */ jsx(Document, { children: /* @__PURE__ */ jsx(Page, { size: [226.4, 1700], style: styles.page, children: /* @__PURE__ */ jsxs(View, { style: styles.section, children: [
+    /* @__PURE__ */ jsx(Text, { style: styles.title, children: "Munincipalidad Distrital de San Miguel" }),
+    /* @__PURE__ */ jsx(Text, { children: "-------------------------------" }),
+    /* @__PURE__ */ jsx(Text, { style: styles.code, children: ticketData.visible_code }),
+    /* @__PURE__ */ jsx(Text, { children: "-------------------------------" }),
+    /* @__PURE__ */ jsx(Text, { style: styles.area, children: ticketData.area.name }),
+    /* @__PURE__ */ jsx(Text, { style: styles.date, children: ticketData.created_at })
+  ] }) }) });
+}
+const PrintPDF = (element) => {
+  const print = async () => {
+    try {
+      const blob = await pdf(element).toBlob();
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const base64 = reader.result.split(",")[1];
+        if (!qz.websocket.isActive()) {
+          await qz.websocket.connect();
+        }
+        const printers = await qz.printers.find();
+        console.log("Impresoras disponibles:", printers);
+        const config = qz.configs.create(
+          "Kyocera-ECOSYS-M2640idw-oti",
+          {
+            copies: 1,
+            duplex: false,
+            colorType: "blackwhite",
+            // 🔇 Esta línea es clave para que no muestre diálogos
+            rasterize: false,
+            altPrinting: false
+          }
+        );
+        const data = [
+          {
+            type: "pdf",
+            format: "base64",
+            data: base64
+          }
+        ];
+        await qz.print(config, data);
+        alert("Impresión enviada");
+      };
+      reader.readAsDataURL(blob);
+    } catch (error) {
+      console.error("Error al imprimir:", error);
+    }
+  };
+  print();
+};
 const initArea = {
   id: "",
   name: "",
@@ -20,18 +102,21 @@ const initArea = {
   parent_id: "",
   children: [],
   type_id: 0,
+  code: "",
   is_active: 1
 };
 const initData = {
   citizen: {
     ok: false,
-    nombres: "",
-    apellidoPaterno: "",
-    apellidoMaterno: "",
-    nombreCompleto: "",
-    numeroDocumento: "",
-    digitoVerificador: "",
-    tipoDocumento: ""
+    names: "",
+    first_surname: "",
+    second_surname: "",
+    dni: "",
+    address: "",
+    departamet: "",
+    district: "",
+    province: "",
+    message: ""
   },
   area: initArea
 };
@@ -44,6 +129,7 @@ const initSelectedAreas = {
 function TicketGenerator({ areas }) {
   const [screen, setScreen] = useState("search-citizen");
   const { data, setData, post } = useForm(initData);
+  const [ticketData, setTicketData] = useState(null);
   const [selectedAreas, setSelectedAreas] = useState(initSelectedAreas);
   const getAreasByType = (type, parentId) => areas.filter(
     (area) => area.type_id === type && (parentId ? area.parent_id === parentId : true)
@@ -102,11 +188,25 @@ function TicketGenerator({ areas }) {
       case "oficinas":
         setData({ ...data, area: selectedAreas.oficina });
         setScreen("confirm");
+        break;
       case "confirm":
-        post(route("ticket-generator.store"));
+        post(route("ticket-generator.store"), {
+          onSuccess: (data2) => {
+            setTicketData(data2.props.ticketGenerated);
+            PrintPDF(
+              /* @__PURE__ */ jsx(
+                Ticket,
+                {
+                  ticketData: data2.props.ticketGenerated
+                }
+              )
+            );
+          }
+        });
         setScreen("search-citizen");
         setData(initData);
         setSelectedAreas(initSelectedAreas);
+        break;
     }
   };
   const handleDisabledButton = () => {
@@ -124,10 +224,10 @@ function TicketGenerator({ areas }) {
     }
   };
   return /* @__PURE__ */ jsx(GuestLayout, { className: "font-inter", children: /* @__PURE__ */ jsxs("div", { className: "bg-custom-background w-full h-full p-4 select-none", children: [
-    screen !== "search-citizen" ? /* @__PURE__ */ jsx("div", { className: "flex text-cust h-1/15  justify-between items-center", children: /* @__PURE__ */ jsx(
+    screen !== "search-citizen" ? /* @__PURE__ */ jsx("div", { className: "flex text-cust h-1/15 justify-between items-center", children: /* @__PURE__ */ jsx(
       "div",
       {
-        className: "h-1/15  flex items-center",
+        className: " h-full flex items-center bg-custom-foreground text-custom-button-text rounded-md",
         onClick: handleClickBackArrow,
         children: /* @__PURE__ */ jsx(
           MoveLeft,

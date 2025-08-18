@@ -22,16 +22,18 @@ export default function FirstScreen({ setData, data }: props) {
         if (value.length <= 8 && value.length >= 0) {
             setData({
                 ...data,
-                citizen: { ...data.citizen, dni: value },
+                citizen: { ...data.citizen, document_number: value },
             });
         }
-        
-        if (value.length === 8 && value!== '00000000') {
+
+        if (value.length === 8 && value !== '00000000') {
             try {
                 setError('');
                 setIsLoading(true);
                 const response = await searchCitizenByDni(value);
                 setIsLoading(false);
+
+                console.log({response});
                 if (response.ok) {
                     setData({ ...data, citizen: { ...response } });
                     return;
@@ -61,7 +63,7 @@ export default function FirstScreen({ setData, data }: props) {
                         onChange={(e) => {
                             handleOnChangeInput(e);
                         }}
-                        value={data.citizen.dni}
+                        value={data.citizen.document_number}
                         autoFocus
                         type="text"
                         placeholder="Ingresa tu DNI"
