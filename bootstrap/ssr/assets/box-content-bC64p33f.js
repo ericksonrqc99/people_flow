@@ -1,6 +1,7 @@
 import { jsx } from "react/jsx-runtime";
-import { c as capitalizeFirstLetterOnly } from "./utils-RoOYjAmh.js";
+import { c as capitalizeFirstLetterOnly } from "./utils-BMo_LHkK.js";
 import "clsx";
+import "tailwind-merge";
 function BoxContent({
   area,
   className,

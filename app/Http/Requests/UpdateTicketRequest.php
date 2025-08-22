@@ -27,7 +27,7 @@ class UpdateTicketRequest extends FormRequest
     {
         return [
             'ticket' => 'required|array',
-            'ticket.id' => 'required|string|max:100',
+            'ticket.id' => 'required|integer|max:100',
             'ticket.code' => 'required|string|max:100',
             'ticket.visible_code' => 'required|string|max:100',
             'ticket.area_id' => 'required|integer|exists:areas,id',
@@ -38,16 +38,38 @@ class UpdateTicketRequest extends FormRequest
             'ticket.time_admission' => 'nullable|date',
             'ticket.time_departure' => 'nullable|date',
             'ticket.observations' => 'nullable|string|max:255',
+            'ticket.updated_at' => 'required|date', // Para optimistic locking
         ];
     }
 
     public function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
     {
-        // Log the validation failure
-        Log::warning('Validation Failed UpdateTicketRequest', [
+        Log::warning('Validation Failed: UpdateTicketRequest', [
+            // User context
             'user_id' => Auth::id(),
+            'user_email' => Auth::user()?->email,
+
+            // Request context  
+            'ip' => $this->ip(),
+            'user_agent' => $this->userAgent(),
+            'url' => $this->fullUrl(),
+            'method' => $this->method(),
+
+            // Validation context
             'errors' => $validator->errors()->toArray(),
-            'request_data' => $this->all()
+            'failed_fields' => array_keys($validator->errors()->toArray()),
+            'request_data' => $this->except(['password', 'password_confirmation']),
+
+            // Timing context
+            'timestamp' => now()->toISOString(),
+            'route' => $this->route()?->getName(),
+
+            // Additional context
+            'session_id' => session()->getId(),
+            'referer' => $this->header('referer'),
         ]);
+
+        // Call parent to maintain default behavior
+        parent::failedValidation($validator);
     }
 }

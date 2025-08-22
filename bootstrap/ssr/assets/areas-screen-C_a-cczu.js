@@ -1,7 +1,8 @@
 import { jsxs, jsx } from "react/jsx-runtime";
-import BoxContent from "./box-content-IpGNEwbo.js";
-import "./utils-RoOYjAmh.js";
+import BoxContent from "./box-content-bC64p33f.js";
+import "./utils-BMo_LHkK.js";
 import "clsx";
+import "tailwind-merge";
 function AreasScreen({
   areas,
   setScreen,

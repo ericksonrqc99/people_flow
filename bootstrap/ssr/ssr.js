@@ -348,7 +348,7 @@ createServer(
     resolve: (name) => {
       return resolvePageComponent(
         `./pages/${name}.tsx`,
-        /* @__PURE__ */ Object.assign({ "./pages/ticket-generator/components/areas-screen.tsx": () => import("./assets/areas-screen-BthANOT3.js"), "./pages/ticket-generator/components/box-content.tsx": () => import("./assets/box-content-IpGNEwbo.js"), "./pages/ticket-generator/components/confirm-screen.tsx": () => import("./assets/confirm-screen-Cs15LZbZ.js"), "./pages/ticket-generator/components/first-screen.tsx": () => import("./assets/first-screen-DrigbZZM.js"), "./pages/ticket-generator/index.tsx": () => import("./assets/index-CMHX-uF7.js") })
+        /* @__PURE__ */ Object.assign({ "./pages/info/index.tsx": () => import("./assets/index-OABpOoS5.js"), "./pages/ticket-generator/components/areas-screen.tsx": () => import("./assets/areas-screen-C_a-cczu.js"), "./pages/ticket-generator/components/box-content.tsx": () => import("./assets/box-content-bC64p33f.js"), "./pages/ticket-generator/components/confirm-screen.tsx": () => import("./assets/confirm-screen-Diii9Q7o.js"), "./pages/ticket-generator/components/first-screen.tsx": () => import("./assets/first-screen-BEi0PdFT.js"), "./pages/ticket-generator/index.tsx": () => import("./assets/index-Byd_oD5H.js"), "./pages/tickets/components/ActiveTicketBanner.tsx": () => import("./assets/ActiveTicketBanner-VTq1EO4u.js"), "./pages/tickets/components/ActiveTicketMessage.tsx": () => import("./assets/ActiveTicketMessage-h-PcXQqy.js"), "./pages/tickets/components/CategoryTabs.tsx": () => import("./assets/CategoryTabs-EsPFOV0i.js"), "./pages/tickets/components/TicketFocusedView.tsx": () => import("./assets/TicketFocusedView-o0OeJw_X.js"), "./pages/tickets/components/TicketModals.tsx": () => import("./assets/TicketModals-CjhEkLQ2.js"), "./pages/tickets/components/TicketPageHeader.tsx": () => import("./assets/TicketPageHeader-DI2LChoi.js"), "./pages/tickets/components/category-tabs.tsx": () => import("./assets/category-tabs-6Er55Lyt.js"), "./pages/tickets/components/searcher.tsx": () => import("./assets/searcher-v9xdTPPM.js"), "./pages/tickets/components/tab-content.tsx": () => import("./assets/tab-content-C5_INsGi.js"), "./pages/tickets/components/tabs-list.tsx": () => import("./assets/tabs-list-rbzJlSi_.js"), "./pages/tickets/index-refactored.tsx": () => import("./assets/index-refactored-BcaH55w6.js"), "./pages/tickets/index.tsx": () => import("./assets/index-C51m6io7.js") })
       );
     },
     setup: ({ App, props }) => {
@@ -362,3 +362,6 @@ createServer(
     }
   })
 );
+export {
+  T
+};

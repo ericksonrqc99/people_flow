@@ -39,12 +39,12 @@ class StoreTicketRequest extends FormRequest
             'citizen' => 'required|array',
             'citizen.document_number' => 'required|digits_between:7,10',
             'citizen.names' => 'required|string|max:100',
-            'citizen.first_surname' => 'required|string|max:100',
-            'citizen.second_surname' => 'string|max:100',
-            'citizen.departament' => 'required|string|max:100',
-            'citizen.province' => 'required|string|max:100',
-            'citizen.district' => 'required|string|max:100',
-            'citizen.address' => 'required|string|max:100',
+            'citizen.first_surname' => 'nullable|required|string|max:100',
+            'citizen.second_surname' => 'nullable|string|max:100',
+            'citizen.departament' => 'nullable|string|max:100',
+            'citizen.province' => 'nullable|string|max:100',
+            'citizen.district' => 'nullable|string|max:100',
+            'citizen.address' => 'nullable|string|max:100',
         ];
     }
 
@@ -53,14 +53,33 @@ class StoreTicketRequest extends FormRequest
 
     protected function failedValidation(Validator $validator)
     {
-        dd($validator->errors()->toArray());
-        dd($this->all());
 
-        Log::warning('Validation Failed StoreTicketRequest', [
+        Log::warning('Validation Failed: StoreTicketRequest', [
+            // User context
             'user_id' => Auth::id(),
-            'ip' => request()->ip(),
-            'input' => request()->all(),
-            'errors' => $validator->errors()->toArray()
+            'user_email' => Auth::user()?->email,
+
+            // Request context  
+            'ip' => $this->ip(),
+            'user_agent' => $this->userAgent(),
+            'url' => $this->fullUrl(),
+            'method' => $this->method(),
+
+            // Validation context
+            'errors' => $validator->errors()->toArray(),
+            'failed_fields' => array_keys($validator->errors()->toArray()),
+            'request_data' => $this->except(['password', 'password_confirmation']),
+
+            // Timing context
+            'timestamp' => now()->toISOString(),
+            'route' => $this->route()?->getName(),
+
+            // Additional context
+            'session_id' => session()->getId(),
+            'referer' => $this->header('referer'),
         ]);
+
+        // Call parent to maintain default behavior
+        parent::failedValidation($validator);
     }
 }

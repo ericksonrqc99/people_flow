@@ -1,16 +1,15 @@
 import { jsx, jsxs } from "react/jsx-runtime";
-import FirstScreen from "./first-screen-DrigbZZM.js";
-import AreasScreen from "./areas-screen-BthANOT3.js";
-import ConfirmScreen from "./confirm-screen-Cs15LZbZ.js";
+import FirstScreen from "./first-screen-BEi0PdFT.js";
+import AreasScreen from "./areas-screen-C_a-cczu.js";
+import ConfirmScreen from "./confirm-screen-Diii9Q7o.js";
 import { MoveLeft } from "lucide-react";
 import { useState, useMemo } from "react";
 import { useForm } from "@inertiajs/react";
-import { Document, Page, StyleSheet, View, Text, pdf } from "@react-pdf/renderer";
-import qz from "qz-tray";
 import "axios";
-import "./utils-RoOYjAmh.js";
+import "./utils-BMo_LHkK.js";
 import "clsx";
-import "./box-content-IpGNEwbo.js";
+import "tailwind-merge";
+import "./box-content-bC64p33f.js";
 function GuestLayout({
   children,
   className,
@@ -25,75 +24,6 @@ function GuestLayout({
     }
   );
 }
-const styles = StyleSheet.create({
-  page: {
-    flexDirection: "row",
-    backgroundColor: "#E4E4E4"
-  },
-  section: {
-    margin: 10,
-    padding: 10,
-    flexGrow: 1,
-    textAlign: "center"
-  },
-  centeredText: {
-    textAlign: "center"
-  },
-  code: { padding: "2 0", fontWeight: "bold" },
-  area: { padding: "2 0" },
-  date: { fontSize: 10, margin: "10 0 0 0" },
-  title: { fontSize: 10 }
-});
-function Ticket({ ticketData }) {
-  return /* @__PURE__ */ jsx(Document, { children: /* @__PURE__ */ jsx(Page, { size: [226.4, 1700], style: styles.page, children: /* @__PURE__ */ jsxs(View, { style: styles.section, children: [
-    /* @__PURE__ */ jsx(Text, { style: styles.title, children: "Munincipalidad Distrital de San Miguel" }),
-    /* @__PURE__ */ jsx(Text, { children: "-------------------------------" }),
-    /* @__PURE__ */ jsx(Text, { style: styles.code, children: ticketData.visible_code }),
-    /* @__PURE__ */ jsx(Text, { children: "-------------------------------" }),
-    /* @__PURE__ */ jsx(Text, { style: styles.area, children: ticketData.area.name }),
-    /* @__PURE__ */ jsx(Text, { style: styles.date, children: ticketData.created_at })
-  ] }) }) });
-}
-const PrintPDF = (element) => {
-  const print = async () => {
-    try {
-      const blob = await pdf(element).toBlob();
-      const reader = new FileReader();
-      reader.onload = async () => {
-        const base64 = reader.result.split(",")[1];
-        if (!qz.websocket.isActive()) {
-          await qz.websocket.connect();
-        }
-        const printers = await qz.printers.find();
-        console.log("Impresoras disponibles:", printers);
-        const config = qz.configs.create(
-          "Kyocera-ECOSYS-M2640idw-oti",
-          {
-            copies: 1,
-            duplex: false,
-            colorType: "blackwhite",
-            // 🔇 Esta línea es clave para que no muestre diálogos
-            rasterize: false,
-            altPrinting: false
-          }
-        );
-        const data = [
-          {
-            type: "pdf",
-            format: "base64",
-            data: base64
-          }
-        ];
-        await qz.print(config, data);
-        alert("Impresión enviada");
-      };
-      reader.readAsDataURL(blob);
-    } catch (error) {
-      console.error("Error al imprimir:", error);
-    }
-  };
-  print();
-};
 const initArea = {
   id: "",
   name: "",
@@ -111,7 +41,7 @@ const initData = {
     names: "",
     first_surname: "",
     second_surname: "",
-    dni: "",
+    document_number: "",
     address: "",
     departamet: "",
     district: "",
@@ -190,17 +120,10 @@ function TicketGenerator({ areas }) {
         setScreen("confirm");
         break;
       case "confirm":
+        console.log({ data });
         post(route("ticket-generator.store"), {
           onSuccess: (data2) => {
             setTicketData(data2.props.ticketGenerated);
-            PrintPDF(
-              /* @__PURE__ */ jsx(
-                Ticket,
-                {
-                  ticketData: data2.props.ticketGenerated
-                }
-              )
-            );
           }
         });
         setScreen("search-citizen");

@@ -1,8 +1,9 @@
 import { jsxs, jsx } from "react/jsx-runtime";
 import axios from "axios";
-import { a as capitalizeFirstLetter } from "./utils-RoOYjAmh.js";
+import { a as capitalizeFirstLetter } from "./utils-BMo_LHkK.js";
 import { useState } from "react";
 import "clsx";
+import "tailwind-merge";
 const searchCitizenByDni = async (dni) => {
   const response = await axios.get(
     route("citizen.search-citizen-by-dni", {
@@ -23,7 +24,7 @@ function FirstScreen({ setData, data }) {
     if (value.length <= 8 && value.length >= 0) {
       setData({
         ...data,
-        citizen: { ...data.citizen, dni: value }
+        citizen: { ...data.citizen, document_number: value }
       });
     }
     if (value.length === 8 && value !== "00000000") {
@@ -32,6 +33,7 @@ function FirstScreen({ setData, data }) {
         setIsLoading(true);
         const response = await searchCitizenByDni(value);
         setIsLoading(false);
+        console.log({ response });
         if (response.ok) {
           setData({ ...data, citizen: { ...response } });
           return;
@@ -59,7 +61,7 @@ function FirstScreen({ setData, data }) {
           onChange: (e) => {
             handleOnChangeInput(e);
           },
-          value: data.citizen.dni,
+          value: data.citizen.document_number,
           autoFocus: true,
           type: "text",
           placeholder: "Ingresa tu DNI",

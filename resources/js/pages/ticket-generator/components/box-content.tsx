@@ -81,7 +81,7 @@ export default function BoxContent({
             className={`bg-custom-muted px-2 min-h-40  py-4 flex items-center justify-center rounded-md hover:bg-custom-200 cursor-pointer border-4  border-transparent ${className} shadow-lg ${setStyles() && 'border-4 border-dashed !border-black'}`}
         >
             <h3 className="text-center font-semibold">
-                {capitalizeFirstLetterOnly(area.short_name)}
+                {area.short_name}
             </h3>
         </div>
     );

@@ -25,4 +25,18 @@ class TicketService
 
         return $foundTickets->load('area', 'citizen', 'status', 'attendedBy');
     }
+
+    public static function getUserActiveTicket(int $userId)
+    {
+        // Find ticket assigned to user with status "atendiendo" (assuming status_id = 6)
+        // You might need to adjust the status_id based on your database
+        $activeTicket = Ticket::where('attended_by_id', $userId)
+            ->whereHas('status', function($query) {
+                $query->where('type', 'atendiendo');
+            })
+            ->whereDate("created_at", Carbon::today())
+            ->first();
+
+        return $activeTicket ? $activeTicket->load('area', 'citizen', 'status', 'attendedBy') : null;
+    }
 }

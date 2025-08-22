@@ -1,12 +1,9 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import axios from 'axios';
-import { route } from 'ziggy-js';
 import { useTicketEcho } from '@/hooks/useMultipleEcho';
 import { useTicketActions } from '@/hooks/useTicketActions';
 import { AvaibleTicketTypesT, Ticket, TicketStatusTypeT } from '@/types/general';
-import { TicketSchema } from '@/schemas/ticket';
 
 // Components
 import TicketPageHeader from './components/TicketPageHeader';
@@ -24,23 +21,16 @@ export default function TicketsPage({ ...props }) {
         ticketTypes,
         userHasActiveTicket = false,
         activeTicket = null,
-        areas = [],
     } = props;
 
     // State
-    const [ticketsData, setTicketsData] = useState<Ticket[]>(() => {
-        // Normalizar tickets con Zod al inicializar
-        return tickets.map((ticket: any) => TicketSchema.parse(ticket));
-    });
+    const [ticketsData, setTicketsData] = useState<Ticket[]>(tickets);
     const [hasActiveTicket, setHasActiveTicket] = useState(userHasActiveTicket);
-    const [currentActiveTicket, setCurrentActiveTicket] = useState(() => {
-        // Normalizar ticket activo si existe
-        return activeTicket ? TicketSchema.parse(activeTicket) : null;
-    });
+    const [currentActiveTicket, setCurrentActiveTicket] = useState(activeTicket);
     const [focusedTicket, setFocusedTicket] = useState<Ticket | null>(null);
     const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
-    const [activeTab, setActiveTab] = useState('en espera');
+    const [activeTab, setActiveTab] = useState('todos');
 
     // Modals state
     const [showTakeModal, setShowTakeModal] = useState(false);
@@ -49,11 +39,10 @@ export default function TicketsPage({ ...props }) {
     const [showCloseModal, setShowCloseModal] = useState(false);
     const [showReleaseModal, setShowReleaseModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [showDeriveModal, setShowDeriveModal] = useState(false);
 
     // Form state
     const [closeForm, setCloseForm] = useState({
-        estado: 'cerrado' as 'cerrado' | 'cancelado',
+        estado: '' as 'cerrado' | 'cancelado',
         comentario: '',
     });
     const [editForm, setEditForm] = useState({
@@ -63,10 +52,6 @@ export default function TicketsPage({ ...props }) {
         estado: '',
         fecha: '',
         comentario: '',
-    });
-    const [deriveForm, setDeriveForm] = useState({
-        toAreaId: '',
-        reason: '',
     });
 
     const notificationSound = useRef<HTMLAudioElement | null>(null);
@@ -82,9 +67,8 @@ export default function TicketsPage({ ...props }) {
     });
 
     // Handle ticket creation/update callbacks
-    const handleTicketCreated = (e: { ticket: any }) => {
-        const normalizedTicket = TicketSchema.parse(e.ticket);
-        setTicketsData((prevTickets) => [normalizedTicket, ...prevTickets]);
+    const handleTicketCreated = (e: { ticket: Ticket }) => {
+        setTicketsData((prevTickets) => [e.ticket, ...prevTickets]);
         if (notificationSound.current) {
             notificationSound.current.play().catch((error) => {
                 console.error('No se pudo reproducir el sonido:', error);
@@ -92,37 +76,19 @@ export default function TicketsPage({ ...props }) {
         }
     };
 
-    const handleTicketUpdated = (e: { ticket: any }) => {
-        const normalizedTicket = TicketSchema.parse(e.ticket);
+    const handleTicketUpdated = (e: { ticket: Ticket }) => {
         setTicketsData((prevTickets) =>
             prevTickets.map((prevTicket) => {
-                return prevTicket.id === normalizedTicket.id ? normalizedTicket : prevTicket;
+                return prevTicket.id === e.ticket.id ? e.ticket : prevTicket;
             }),
         );
-    };
-
-    const handleTicketDerived = (e: { ticket: any; fromAreaId: number; reason: string; derivedByUserId: number }) => {
-        const normalizedTicket = TicketSchema.parse(e.ticket);
-        // Add the derived ticket to our area
-        setTicketsData((prevTickets) => [normalizedTicket, ...prevTickets]);
-        
-        // Show notification
-        if (notificationSound.current) {
-            notificationSound.current.play().catch(console.error);
-        }
-        
-        console.log('Ticket derivado recibido:', {
-            ticket: normalizedTicket,
-            fromAreaId: e.fromAreaId,
-            reason: e.reason
-        });
     };
 
     // Echo setup
     const {
         listen: listenToTicketChannels,
         stopListening: stopListeningToTicketChannels,
-    } = useTicketEcho(user.area.id, handleTicketCreated, handleTicketUpdated, handleTicketDerived);
+    } = useTicketEcho(user.area.id, handleTicketCreated, handleTicketUpdated);
 
     useEffect(() => {
         listenToTicketChannels();
@@ -141,17 +107,9 @@ export default function TicketsPage({ ...props }) {
     // Filter tickets
     const getFilteredTickets = () => {
         return ticketsData.filter((ticket) => {
-            const fullName = [
-                ticket.citizen?.names,
-                ticket.citizen?.first_surname,
-                ticket.citizen?.second_surname
-            ].filter(Boolean).join(' ').toLowerCase();
-            
-            const searchLower = searchTerm.toLowerCase();
-            
-            const matchesSearch = fullName.includes(searchLower) ||
-                String(ticket.citizen?.document_number || '').includes(searchTerm) ||
-                ticket.visible_code?.toLowerCase().includes(searchLower);
+            const matchesSearch = ticket.citizen?.names?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                ticket.citizen?.document_number?.includes(searchTerm) ||
+                ticket.visible_code?.toLowerCase().includes(searchTerm.toLowerCase());
 
             let matchesEstado = true;
             if (activeTab !== 'todos') {
@@ -189,7 +147,7 @@ export default function TicketsPage({ ...props }) {
             const result = await handleCloseTicket(focusedTicket, closeForm);
             if (result?.success) {
                 setShowCloseModal(false);
-                setCloseForm({ estado: 'cerrado' as 'cerrado' | 'cancelado', comentario: '' });
+                setCloseForm({ estado: '' as 'cerrado' | 'cancelado', comentario: '' });
             }
         }
     };
@@ -199,42 +157,6 @@ export default function TicketsPage({ ...props }) {
             const result = await handleReleaseTicket(focusedTicket, currentActiveTicket);
             if (result?.success) {
                 setShowReleaseModal(false);
-            }
-        }
-    };
-
-    const onDeriveTicket = async () => {
-        if (focusedTicket && deriveForm.toAreaId && deriveForm.reason.trim()) {
-            try {
-                const response = await axios.post(route('tickets.derive'), {
-                    ticket_id: focusedTicket.id,
-                    to_area_id: parseInt(deriveForm.toAreaId),
-                    reason: deriveForm.reason,
-                });
-
-                const result = response.data;
-
-                if (result.ok) {
-                    setShowDeriveModal(false);
-                    setDeriveForm({ toAreaId: '', reason: '' });
-                    
-                    // Remove ticket from current area since it was derived
-                    setTicketsData((prevTickets) => 
-                        prevTickets.filter(ticket => ticket.id !== focusedTicket.id)
-                    );
-                    
-                    // Clear focused ticket since it's no longer in this area
-                    setFocusedTicket(null);
-                    setHasActiveTicket(false);
-                    setCurrentActiveTicket(null);
-                    
-                    console.log('Ticket derivado exitosamente');
-                } else {
-                    alert(result.message || 'Error al derivar el ticket');
-                }
-            } catch (error) {
-                console.error('Error derivando ticket:', error);
-                alert('Error al derivar el ticket. Por favor intente nuevamente.');
             }
         }
     };
@@ -262,8 +184,8 @@ export default function TicketsPage({ ...props }) {
                 areaName={user.area?.name} 
             />
 
-            {/* Active Ticket Banner - solo mostrar si no hay focused ticket */}
-            {hasActiveTicket && currentActiveTicket && !focusedTicket && (
+            {/* Active Ticket Banner */}
+            {hasActiveTicket && currentActiveTicket && (
                 <ActiveTicketBanner 
                     currentActiveTicket={currentActiveTicket}
                     onViewTicket={onViewActiveTicket}
@@ -274,9 +196,10 @@ export default function TicketsPage({ ...props }) {
             {focusedTicket ? (
                 <TicketFocusedView 
                     ticket={focusedTicket}
+                    onBack={() => setFocusedTicket(null)}
+                    onEdit={() => setShowEditModal(true)}
                     onClose={() => setShowCloseModal(true)}
                     onRelease={() => setShowReleaseModal(true)}
-                    onDerive={() => setShowDeriveModal(true)}
                 />
             ) : hasActiveTicket && !focusedTicket ? (
                 <ActiveTicketMessage />
@@ -332,14 +255,6 @@ export default function TicketsPage({ ...props }) {
                 // Delete Modal
                 showDeleteModal={showDeleteModal}
                 setShowDeleteModal={setShowDeleteModal}
-                
-                // Derive Modal
-                showDeriveModal={showDeriveModal}
-                setShowDeriveModal={setShowDeriveModal}
-                deriveForm={deriveForm}
-                setDeriveForm={setDeriveForm}
-                onDeriveTicket={onDeriveTicket}
-                areas={areas}
             />
         </div>
     );

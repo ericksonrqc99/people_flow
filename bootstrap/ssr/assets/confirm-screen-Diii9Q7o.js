@@ -1,6 +1,7 @@
 import { jsxs, jsx } from "react/jsx-runtime";
-import { f as formatterNameCitizen } from "./utils-RoOYjAmh.js";
+import { f as formatterNameCitizen } from "./utils-BMo_LHkK.js";
 import "clsx";
+import "tailwind-merge";
 function ConfirmScreen({ data }) {
   return /* @__PURE__ */ jsxs("section", { className: "flex flex-col justify-center items-center gap-y-6 h-full ", children: [
     /* @__PURE__ */ jsx("h1", { className: "text-center text-custom-foreground text-4xl font-semibold", children: "Confirmar Datos" }),

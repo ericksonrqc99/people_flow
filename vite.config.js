@@ -26,7 +26,7 @@ export default defineConfig({
             origin: '*', // esto es lo que activa Access-Control-Allow-Origin
         },
         hmr: {
-            host: '192.168.0.102', // tu IP en la red local
+            host: '192.168.101.30', // tu IP en la red local
         },
     },
     cors: {

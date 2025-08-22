@@ -35,7 +35,7 @@ export default function AreasScreen({
         <div className="flex flex-col gap-y-6 items-center">
             <h1 className="text-center text-4xl font-semibold text-custom-foreground">{title}</h1>
             <section className="flex flex-col justify-between items-center gap-y-6">
-                <div className="grid grid-cols-6 gap-2 w-10/12">
+                <div className="grid grid-cols-4 gap-2 w-10/12">
                     {areas.map((area) => (
                         <BoxContent
                             area={area}

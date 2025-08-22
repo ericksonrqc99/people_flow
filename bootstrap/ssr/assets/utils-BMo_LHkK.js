@@ -1,4 +1,8 @@
-import "clsx";
+import { clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+function cn(...inputs) {
+  return twMerge(clsx(inputs));
+}
 function capitalizeFirstLetter(str) {
   if (!str) return "";
   return str.toLowerCase().split(" ").map((palabra) => palabra.charAt(0).toUpperCase() + palabra.slice(1)).join(" ");
@@ -15,6 +19,7 @@ function formatterNameCitizen(citizen) {
 }
 export {
   capitalizeFirstLetter as a,
+  cn as b,
   capitalizeFirstLetterOnly as c,
   formatterNameCitizen as f
 };
