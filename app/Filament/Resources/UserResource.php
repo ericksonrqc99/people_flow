@@ -13,6 +13,8 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Models\Role;
 
 class UserResource extends Resource
 {
@@ -33,37 +35,52 @@ class UserResource extends Resource
                     ->columnSpanFull()
                     ->default(true)
                     ->required(),
-                Forms\Components\Fieldset::make('Datos del usuario')->schema([
-                    Forms\Components\TextInput::make('name')
-                        ->label(__('Nombre Completo'))
-                        ->required()
-                        ->maxLength(255),
-                    Forms\Components\TextInput::make('email')
-                        ->label(__('Correo'))
-                        ->email()
-                        ->required()
-                        ->maxLength(255),
-                    Forms\Components\TextInput::make('password')
-                        ->label(__('Contraseña'))
-                        ->password()
-                        ->required(fn(string $operation) => $operation === 'create')
-                        ->maxLength(255),
-                ]),
-                Forms\Components\Fieldset::make('Area')->schema([
-                    Forms\Components\Select::make('area_id')
-                        ->label(__('Area'))
-                        ->searchable()
-                        ->options(fn() => Area::all()->pluck('name', 'id'))
-                        ->preload()
-                        ->relationship('area', 'name'),
-                ])
+                Forms\Components\Tabs::make('Tabs')->tabs([
+                    Forms\Components\Tabs\Tab::make('Datos del usuario')->schema([
+                        Forms\Components\TextInput::make('name')
+                            ->label(__('Nombre Completo'))
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('email')
+                            ->label(__('Correo'))
+                            ->email()
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('password')
+                            ->label(__('Contraseña'))
+                            ->password()
+                            ->required(fn(string $operation) => $operation === 'create')
+                            ->maxLength(255),
+                    ]),
+                    Forms\Components\Tabs\Tab::make('Area')->schema([
+                        Forms\Components\Select::make('area_id')
+                            ->label(__('Area'))
+                            ->searchable()
+                            ->options(fn() => Area::all()->pluck('name', 'id'))
+                            ->preload()
+                            ->relationship('area', 'name'),
+                    ]),
+                    Forms\Components\Tabs\Tab::make('Roles')->schema([
+                        Forms\Components\Select::make('roles')
+                            ->multiple()
+                            ->label(__('Rol'))
+                            ->preload()
+                            ->options(fn() => Role::all()->pluck('name', 'id'))
+                            ->relationship('roles', 'name'),
+                    ])
+
+                ])->columnSpanFull()
+
             ]);
     }
+
+
 
     public static function table(Table $table): Table
     {
         return $table
             ->deferLoading()
+            ->modifyQueryUsing(fn (Builder $query) => $query->where('id', '!=', Auth::id()))
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('Nombre'))
@@ -105,10 +122,21 @@ class UserResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->visible(function (User $record): bool {
+                        $superAdminEmail = env('SUPER_ADMIN_EMAIL', 'super-admin@munisanmiguel-sanroman.gob.pe');
+                        // No mostrar delete para super admin (ya está filtrado el usuario logueado en la tabla)
+                        return $record->email !== $superAdminEmail;
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->before(function ($records) {
+                            $superAdminEmail = env('SUPER_ADMIN_EMAIL', 'super-admin@munisanmiguel-sanroman.gob.pe');
+                            // Filtrar para remover al super admin de la selección (el usuario logueado ya está filtrado)
+                            return $records->filter(fn($record) => $record->email !== $superAdminEmail);
+                        }),
                 ]),
             ]);
     }

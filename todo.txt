@@ -1,2 +1,0 @@
-TODO:: agregar soporte para fallos de api
-TODO:: do not allow deleting superadmin

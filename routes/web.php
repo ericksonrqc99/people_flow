@@ -13,7 +13,7 @@ Route::get('/', function () {
 
 // generator of tickets
 Route::get('/ticket-generator', [TicketController::class, 'ticketGenerator'])
-    ->middleware(['auth', 'no-cache'])
+    ->middleware(['auth', 'no-cache', 'can:Ver Panel De Generacion De Tickets'])
     ->name('ticket-generator-get');
 
 Route::post('/ticket-generator', [TicketController::class, 'store'])
@@ -22,7 +22,7 @@ Route::post('/ticket-generator', [TicketController::class, 'store'])
 
 // show tickets for area
 Route::get('/tickets', [TicketController::class, 'ticketPanel'])
-    ->middleware(['auth', 'no-cache'])
+    ->middleware(['auth', 'no-cache', 'can:Ver Panel De Tickets'])
     ->name('ticket-visualizer');
 
 Route::put('/tickets', [TicketController::class, 'update'])
