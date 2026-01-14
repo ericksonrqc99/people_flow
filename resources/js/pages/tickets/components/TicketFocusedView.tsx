@@ -121,184 +121,174 @@ export default function TicketFocusedView({
 
     return (
         <div className="space-y-6">
-            {/* Card principal con diseño físico moderno */}
-            <Card className="border border-gray-200 shadow-2xl bg-white rounded-3xl overflow-hidden hover:shadow-3xl transition-shadow duration-500">
-                {/* Header con diseño más sutil */}
-                <CardHeader className="bg-gray-100 border-b border-gray-200 pt-6 pb-6 px-6">
+            {/* Main Card - AdminLTE Style */}
+            <Card className="border-none shadow-lg rounded-lg overflow-hidden">
+                {/* Header */}
+                <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4">
-                            <div className="w-14 h-14 bg-emerald-100 rounded-2xl flex items-center justify-center border border-emerald-200 shadow-sm">
-                                <User className="w-7 h-7 text-emerald-600" />
+                            <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
+                                <User className="w-6 h-6" />
                             </div>
                             <div>
-                                <CardTitle className="text-2xl font-bold tracking-wide text-gray-900">
+                                <CardTitle className="text-2xl font-bold">
                                     {`${ticket.citizen?.names} ${ticket.citizen?.first_surname} ${ticket.citizen?.second_surname}`}
                                 </CardTitle>
-                                <p className="text-emerald-600 font-medium text-lg">
+                                <p className="text-blue-100">
                                     Ticket #{ticket.visible_code}
                                 </p>
                             </div>
                         </div>
-                        <div className="bg-white/80 backdrop-blur-sm rounded-xl px-3 py-2 border border-gray-200 shadow-sm">
-                            <div className="flex items-center gap-2 flex-wrap">
-                                {getStatusBadge(ticket.status?.type || 'en espera')}
-                                {isTicketDerived(ticket) && (
-                                    <Badge 
-                                        variant="outline"
-                                        className="bg-blue-50 text-blue-700 border-blue-200"
-                                    >
-                                        <ArrowRightLeft className="w-3 h-3 mr-1" />
-                                        Derivado
-                                    </Badge>
-                                )}
-                            </div>
+                        <div className="flex gap-2">
+                            {getStatusBadge(ticket.status?.type || 'en espera')}
+                            {isTicketDerived(ticket) && (
+                                <Badge 
+                                    className="bg-purple-200 text-purple-800 border border-purple-300"
+                                >
+                                    <ArrowRightLeft className="w-3 h-3 mr-1" />
+                                    Derivado
+                                </Badge>
+                            )}
                         </div>
                     </div>
                 </CardHeader>
 
                 <CardContent className="p-8">
-                    {/* Grid de información con estilo de tarjetas físicas */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                        {/* DNI Card */}
-                        <div className="group cursor-default">
-                            <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-5 rounded-2xl border border-gray-200 shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
-                                <div className="flex items-center space-x-3 mb-3">
-                                    <div className="w-8 h-8 bg-gray-200 rounded-lg flex items-center justify-center">
-                                        <IdCard className="w-4 h-4 text-gray-600" />
-                                    </div>
-                                    <span className="text-sm font-semibold text-gray-600 uppercase tracking-wide">DNI</span>
-                                </div>
-                                <p className="text-xl font-bold text-gray-900 font-mono">
-                                    {ticket.citizen?.document_number || 'No especificado'}
-                                </p>
+                    {/* Info Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                        {/* DNI */}
+                        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                            <div className="flex items-center space-x-2 mb-2">
+                                <IdCard className="w-4 h-4 text-gray-600" />
+                                <span className="text-xs font-semibold text-gray-600 uppercase">DNI</span>
                             </div>
+                            <p className="text-lg font-bold text-gray-900">
+                                {ticket.citizen?.document_number || 'N/A'}
+                            </p>
                         </div>
 
-                        {/* Área Card */}
-                        <div className="group cursor-default">
-                            <div className="bg-gradient-to-br from-emerald-50 to-green-100 p-5 rounded-2xl border border-emerald-200 shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
-                                <div className="flex items-center space-x-3 mb-3">
-                                    <div className="w-8 h-8 bg-emerald-200 rounded-lg flex items-center justify-center">
-                                        <Building2 className="w-4 h-4 text-emerald-700" />
-                                    </div>
-                                    <span className="text-sm font-semibold text-emerald-700 uppercase tracking-wide">Área</span>
-                                </div>
-                                <p className="text-xl font-bold text-emerald-900">
-                                    {ticket.area?.name || 'No asignada'}
-                                </p>
+                        {/* Área */}
+                        <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                            <div className="flex items-center space-x-2 mb-2">
+                                <Building2 className="w-4 h-4 text-green-600" />
+                                <span className="text-xs font-semibold text-green-600 uppercase">Área</span>
                             </div>
+                            <p className="text-lg font-bold text-green-900">
+                                {ticket.area?.name || 'N/A'}
+                            </p>
                         </div>
 
-                        {/* Tiempo Card */}
-                        <div className="group cursor-default md:col-span-2">
-                            <div className="bg-gradient-to-br from-blue-50 to-indigo-100 p-5 rounded-2xl border border-blue-200 shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
-                                <div className="flex items-center space-x-3 mb-3">
-                                    <div className="w-8 h-8 bg-blue-200 rounded-lg flex items-center justify-center">
-                                        <Clock className="w-4 h-4 text-blue-700" />
-                                    </div>
-                                    <span className="text-sm font-semibold text-blue-700 uppercase tracking-wide">Hora de Admisión</span>
-                                </div>
-                                <p className="text-xl font-bold text-blue-900">
-                                    {ticket.time_admission || 'Recién asignado'}
-                                </p>
+                        {/* Hora */}
+                        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                            <div className="flex items-center space-x-2 mb-2">
+                                <Clock className="w-4 h-4 text-blue-600" />
+                                <span className="text-xs font-semibold text-blue-600 uppercase">Admisión</span>
                             </div>
+                            <p className="text-lg font-bold text-blue-900">
+                                {ticket.time_admission || 'Reciente'}
+                            </p>
+                        </div>
+
+                        {/* Atendido por */}
+                        <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                            <div className="flex items-center space-x-2 mb-2">
+                                <UserCheck className="w-4 h-4 text-purple-600" />
+                                <span className="text-xs font-semibold text-purple-600 uppercase">Atendido por</span>
+                            </div>
+                            <p className="text-lg font-bold text-purple-900">
+                                {ticket.attended_by?.name || 'N/A'}
+                            </p>
                         </div>
                     </div>
 
-                    {/* Observaciones si existen */}
+                    {/* Observaciones */}
                     {ticket.observations && (
-                        <div className="mb-8">
-                            <div className="bg-gradient-to-br from-amber-50 to-yellow-100 p-6 rounded-2xl border border-amber-200 shadow-md">
-                                <div className="flex items-center space-x-3 mb-4">
-                                    <div className="w-8 h-8 bg-amber-200 rounded-lg flex items-center justify-center">
-                                        <FileText className="w-4 h-4 text-amber-700" />
-                                    </div>
-                                    <h3 className="text-lg font-bold text-amber-900 uppercase tracking-wide">Observaciones</h3>
-                                </div>
-                                <div className="bg-white/70 backdrop-blur-sm rounded-xl p-4 max-h-[160px] overflow-y-auto border border-amber-300/30">
-                                    <p className="text-gray-800 whitespace-pre-wrap break-words leading-relaxed">
-                                        {ticket.observations}
-                                    </p>
-                                </div>
+                        <div className="mb-8 p-4 bg-amber-50 border-l-4 border-l-amber-500 rounded">
+                            <div className="flex items-center space-x-2 mb-3">
+                                <FileText className="w-4 h-4 text-amber-600" />
+                                <h3 className="font-bold text-amber-900">Observaciones</h3>
+                            </div>
+                            <div className="bg-white p-4 rounded border border-amber-200 max-h-48 overflow-y-auto">
+                                <p className="text-gray-800 whitespace-pre-wrap">
+                                    {ticket.observations}
+                                </p>
                             </div>
                         </div>
                     )}
 
-                    {/* Botones de acción con estilo físico */}
-                    <div className="border-t border-gray-100 pt-6">
-                        <div className="flex flex-col sm:flex-row gap-4">
-                            {/* Dropdown de Más Opciones */}
-                            <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
-                                <DropdownMenuTrigger asChild>
-                                    <Button 
-                                        variant="outline"
-                                        className="flex-1 h-14 border-2 border-blue-200 text-blue-700 hover:bg-blue-50 hover:border-blue-300 rounded-xl font-semibold text-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5"
-                                    >
-                                        <MoreVertical className="h-5 w-5 mr-3" />
-                                        Más Opciones
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent className="w-56" align="start">
-                                    <DropdownMenuLabel>Acciones del Ticket</DropdownMenuLabel>
-                                    <DropdownMenuSeparator />
-                                    
-                                    {onViewHistory && (
-                                        <DropdownMenuItem onClick={handleViewHistory}>
-                                            <History className="mr-2 h-4 w-4" />
-                                            <span>Ver Historial</span>
-                                        </DropdownMenuItem>
-                                    )}
-                                    
-                                    {onAddNote && (
-                                        <DropdownMenuItem onClick={handleAddNote}>
-                                            <MessageSquare className="mr-2 h-4 w-4" />
-                                            <span>Agregar Nota</span>
-                                        </DropdownMenuItem>
-                                    )}
-                                    
-                                    <DropdownMenuSeparator />
-                                    
-                                    {onReassign && (
-                                        <DropdownMenuItem onClick={handleReassign}>
-                                            <RefreshCw className="mr-2 h-4 w-4" />
-                                            <span>Reasignar Área</span>
-                                        </DropdownMenuItem>
-                                    )}
-                                    
-                                    {onPrintTicket && (
-                                        <DropdownMenuItem onClick={handlePrintTicket}>
-                                            <FileText className="mr-2 h-4 w-4" />
-                                            <span>Imprimir Ticket</span>
-                                        </DropdownMenuItem>
-                                    )}
-                                    
-                                    {onDerive && (
-                                        <DropdownMenuItem onClick={handleDerive}>
-                                            <RefreshCw className="mr-2 h-4 w-4" />
-                                            <span>Derivar a Otra Área</span>
-                                        </DropdownMenuItem>
-                                    )}
-                                    
-                                    <DropdownMenuSeparator />
-                                    
-                                    <DropdownMenuItem 
-                                        onClick={handleRelease}
-                                        className="text-red-600 focus:text-red-600"
-                                    >
-                                        <UserX className="mr-2 h-4 w-4" />
-                                        <span>Liberar Ticket</span>
+                    {/* Actions */}
+                    <div className="flex flex-col sm:flex-row gap-3 border-t pt-6">
+                        {/* Dropdown */}
+                        <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
+                            <DropdownMenuTrigger asChild>
+                                <Button 
+                                    variant="outline"
+                                    className="flex-1 h-12 border-2 border-gray-300 text-gray-700 hover:bg-gray-100 font-semibold rounded-lg shadow-sm"
+                                >
+                                    <MoreVertical className="h-4 w-4 mr-2" />
+                                    Más Opciones
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-56" align="start">
+                                <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                
+                                {onViewHistory && (
+                                    <DropdownMenuItem onClick={handleViewHistory}>
+                                        <History className="mr-2 h-4 w-4" />
+                                        Ver Historial
                                     </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                            
-                            <Button 
-                                onClick={onClose} 
-                                className="flex-1 h-14 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold text-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5"
-                            >
-                                <CheckCircle className="h-5 w-5 mr-3" />
-                                Cerrar Ticket
-                            </Button>
-                        </div>
+                                )}
+                                
+                                {onAddNote && (
+                                    <DropdownMenuItem onClick={handleAddNote}>
+                                        <MessageSquare className="mr-2 h-4 w-4" />
+                                        Agregar Nota
+                                    </DropdownMenuItem>
+                                )}
+                                
+                                <DropdownMenuSeparator />
+                                
+                                {onDerive && (
+                                    <DropdownMenuItem onClick={handleDerive}>
+                                        <ArrowRightLeft className="mr-2 h-4 w-4" />
+                                        Derivar
+                                    </DropdownMenuItem>
+                                )}
+                                
+                                {onReassign && (
+                                    <DropdownMenuItem onClick={handleReassign}>
+                                        <RefreshCw className="mr-2 h-4 w-4" />
+                                        Reasignar
+                                    </DropdownMenuItem>
+                                )}
+                                
+                                {onPrintTicket && (
+                                    <DropdownMenuItem onClick={handlePrintTicket}>
+                                        <FileText className="mr-2 h-4 w-4" />
+                                        Imprimir
+                                    </DropdownMenuItem>
+                                )}
+                                
+                                <DropdownMenuSeparator />
+                                
+                                <DropdownMenuItem 
+                                    onClick={handleRelease}
+                                    className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                                >
+                                    <UserX className="mr-2 h-4 w-4" />
+                                    Liberar
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                        
+                        <Button 
+                            onClick={onClose} 
+                            className="flex-1 h-12 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-md"
+                        >
+                            <CheckCircle className="h-4 w-4 mr-2" />
+                            Cerrar Ticket
+                        </Button>
                     </div>
                 </CardContent>
             </Card>

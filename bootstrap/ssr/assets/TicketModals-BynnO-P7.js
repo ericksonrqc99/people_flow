@@ -1,8 +1,8 @@
 import { jsx, jsxs, Fragment } from "react/jsx-runtime";
-import { B as Button } from "./button-BmnVj2kL.js";
+import { B as Button } from "./button-DYBWqrh5.js";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { XIcon } from "lucide-react";
-import { b as cn } from "./utils-BMo_LHkK.js";
+import { a as cn } from "./utils-CPq9aNLN.js";
 import * as LabelPrimitive from "@radix-ui/react-label";
 import "@radix-ui/react-slot";
 import "class-variance-authority";
@@ -153,6 +153,13 @@ function TicketModals({
   showReleaseModal,
   setShowReleaseModal,
   onReleaseTicket,
+  // Derive Modal
+  showDeriveModal,
+  setShowDeriveModal,
+  deriveForm,
+  setDeriveForm,
+  onDeriveTicket,
+  areas,
   // Edit Modal
   showEditModal,
   setShowEditModal,
@@ -296,7 +303,6 @@ function TicketModals({
           Button,
           {
             onClick: onCloseTicket,
-            disabled: !closeForm.estado,
             children: "Cerrar Ticket"
           }
         )
@@ -318,6 +324,68 @@ function TicketModals({
         /* @__PURE__ */ jsx(DialogDescription, { children: "Funcionalidad de edición en desarrollo." })
       ] }),
       /* @__PURE__ */ jsx(DialogFooter, { children: /* @__PURE__ */ jsx(Button, { onClick: () => setShowEditModal(false), children: "Cerrar" }) })
+    ] }) }),
+    /* @__PURE__ */ jsx(Dialog, { open: showDeriveModal, onOpenChange: setShowDeriveModal, children: /* @__PURE__ */ jsxs(DialogContent, { children: [
+      /* @__PURE__ */ jsxs(DialogHeader, { children: [
+        /* @__PURE__ */ jsx(DialogTitle, { children: "Derivar Ticket" }),
+        /* @__PURE__ */ jsx(DialogDescription, { children: "Selecciona el área a la que deseas derivar este ticket y proporciona una razón." })
+      ] }),
+      /* @__PURE__ */ jsxs("div", { className: "grid gap-4 py-4", children: [
+        /* @__PURE__ */ jsxs("div", { className: "grid grid-cols-4 items-center gap-4", children: [
+          /* @__PURE__ */ jsx(Label, { htmlFor: "area", className: "text-right", children: "Área destino" }),
+          /* @__PURE__ */ jsxs(
+            "select",
+            {
+              id: "area",
+              value: deriveForm.toAreaId,
+              onChange: (e) => setDeriveForm({ ...deriveForm, toAreaId: e.target.value }),
+              className: "col-span-3 px-3 py-2 border border-gray-300 rounded-md",
+              children: [
+                /* @__PURE__ */ jsx("option", { value: "", children: "Selecciona un área" }),
+                areas.map((area) => /* @__PURE__ */ jsx("option", { value: area.id.toString(), children: area.name }, area.id))
+              ]
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxs("div", { className: "grid grid-cols-4 items-center gap-4", children: [
+          /* @__PURE__ */ jsx(Label, { htmlFor: "reason", className: "text-right", children: "Razón" }),
+          /* @__PURE__ */ jsxs("div", { className: "col-span-3", children: [
+            /* @__PURE__ */ jsx(
+              "textarea",
+              {
+                id: "reason",
+                value: deriveForm.reason,
+                onChange: (e) => setDeriveForm({ ...deriveForm, reason: e.target.value }),
+                className: "w-full px-3 py-2 border border-gray-300 rounded-md",
+                rows: 3,
+                placeholder: "Explica por qué derivar este ticket..."
+              }
+            ),
+            /* @__PURE__ */ jsxs("p", { className: `text-xs mt-1 ${deriveForm.reason.trim().length < 10 ? "text-red-500" : "text-green-600"}`, children: [
+              deriveForm.reason.trim().length,
+              "/10 caracteres mínimos"
+            ] })
+          ] })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxs(DialogFooter, { children: [
+        /* @__PURE__ */ jsx(
+          Button,
+          {
+            variant: "outline",
+            onClick: () => setShowDeriveModal(false),
+            children: "Cancelar"
+          }
+        ),
+        /* @__PURE__ */ jsx(
+          Button,
+          {
+            onClick: onDeriveTicket,
+            disabled: !deriveForm.toAreaId || !deriveForm.reason.trim() || deriveForm.reason.trim().length < 10,
+            children: "Derivar Ticket"
+          }
+        )
+      ] })
     ] }) }),
     /* @__PURE__ */ jsx(Dialog, { open: showDeleteModal, onOpenChange: setShowDeleteModal, children: /* @__PURE__ */ jsxs(DialogContent, { children: [
       /* @__PURE__ */ jsxs(DialogHeader, { children: [

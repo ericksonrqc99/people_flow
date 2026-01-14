@@ -1,10 +1,10 @@
 import { jsx, jsxs, Fragment } from "react/jsx-runtime";
-import { C as Card, b as CardHeader, c as CardTitle, a as CardContent } from "./card-Cm8ppzCC.js";
-import { B as Badge } from "./badge-44jshGyU.js";
-import { B as Button } from "./button-BmnVj2kL.js";
+import { C as Card, b as CardHeader, c as CardTitle, a as CardContent } from "./card-o23MGwpj.js";
+import { B as Badge } from "./badge-eMoabTnV.js";
+import { B as Button } from "./button-DYBWqrh5.js";
 import { AlertTriangle, X, LogOut, User, Eye, Building2, Clock } from "lucide-react";
-import { useState } from "react";
-import "./utils-BMo_LHkK.js";
+import { useState, useEffect } from "react";
+import "./utils-CPq9aNLN.js";
 import "clsx";
 import "tailwind-merge";
 import "@radix-ui/react-slot";
@@ -68,8 +68,14 @@ function LogoutConfirmationModal({
   ] }) });
 }
 function TicketPageHeader({ userName, areaName }) {
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(() => {
+    const saved = localStorage.getItem("ticketHeaderVisible");
+    return saved !== null ? JSON.parse(saved) : true;
+  });
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  useEffect(() => {
+    localStorage.setItem("ticketHeaderVisible", JSON.stringify(isVisible));
+  }, [isVisible]);
   const performLogout = () => {
     var _a;
     window.history.pushState(null, "", window.location.href);

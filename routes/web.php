@@ -12,20 +12,20 @@ Route::get('/', function () {
 });
 
 // generator of tickets
-Route::get('/ticket-generator', [TicketController::class, 'ticketGenerator'])
-    ->middleware(['auth', 'no-cache', 'can:Ver Panel De Generacion De Tickets'])
+Route::get('/tickets/module', [TicketController::class, 'ticketGenerator'])
+    ->middleware(['auth', 'no-cache', 'can:Ver Modulo de Tickets'])
     ->name('ticket-generator-get');
 
-Route::post('/ticket-generator', [TicketController::class, 'store'])
+Route::post('/tickets/module', [TicketController::class, 'store'])
     ->middleware(['auth', 'no-cache'])
     ->name('ticket-generator.store');
 
 // show tickets for area
-Route::get('/tickets', [TicketController::class, 'ticketPanel'])
+Route::get('/tickets/panel', [TicketController::class, 'ticketPanel'])
     ->middleware(['auth', 'no-cache', 'can:Ver Panel De Tickets'])
     ->name('ticket-visualizer');
 
-Route::put('/tickets', [TicketController::class, 'update'])
+Route::put('/tickets/panel', [TicketController::class, 'update'])
     ->middleware(['auth', 'no-cache'])
     ->name('tickets.update');
 
@@ -38,7 +38,6 @@ Route::post('/tickets/derive', [TicketController::class, 'derive'])
 Route::get('/clock/server-time', [TicketController::class, 'getServerTime'])
     ->middleware(['auth', 'no-cache'])
     ->name('clock.server-time');
-
 
 // citizen
 Route::get('/citizen/{dni}', [CitizenController::class, 'getCitizenByDni'])->middleware('auth')->name('citizen.search-citizen-by-dni');
@@ -55,3 +54,4 @@ Route::post('/logout', function (Request $request) {
 })->middleware('auth')->name('logout');
 
 Route::redirect('/login', '/admin/login')->name('login');
+

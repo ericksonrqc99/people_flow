@@ -10,7 +10,7 @@
         "singleQuote": true
     },
     "devDependencies": {
-        "@laravel/echo-react": "^2.1.7",
+        "@laravel/echo-react": "^2.2.7",
         "@tailwindcss/vite": "^4.0.0",
         "axios": "^1.9.0",
         "concurrently": "^9.0.1",

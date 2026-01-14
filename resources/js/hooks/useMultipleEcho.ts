@@ -1,5 +1,4 @@
-import { useEchoPublic } from '@laravel/echo-react';
-import { useCallback } from 'react';
+import { useRef } from 'react';
 
 // Type definitions for the hook
 export interface EchoChannel {
@@ -18,21 +17,40 @@ export interface EchoHookResult {
  * @param channels Array of channel configurations
  * @returns Object with listen and stopListening functions for all channels
  */
-export const useMultipleEchoPublic = (channels: EchoChannel[]): EchoHookResult => {
-    // Create Echo hooks for each channel
-    const echoHooks = channels.map(({ channel, event, callback }) =>
-        useEchoPublic(channel, event, callback)
-    );
+export const useMultipleEchoPublic = (
+    channels: EchoChannel[],
+): EchoHookResult => {
+    const listenersRef = useRef<any[]>([]);
 
-    // Function to start listening on all channels
-    const listen = useCallback(() => {
-        echoHooks.forEach(hook => hook.listen());
-    }, [echoHooks]);
+    const listen = () => {
+        if (!window.Echo) {
+            console.error('Echo is not initialized');
+            return;
+        }
 
-    // Function to stop listening on all channels
-    const stopListening = useCallback(() => {
-        echoHooks.forEach(hook => hook.stopListening());
-    }, [echoHooks]);
+        channels.forEach(({ channel, event, callback }) => {
+            console.log(`Listening to channel: ${channel}, event: ${event}`);
+            const listener = window.Echo.channel(channel).listen(
+                event,
+                callback,
+            );
+            listenersRef.current.push({ channel, event, listener });
+        });
+    };
+
+    const stopListening = () => {
+        if (!window.Echo) {
+            console.error('Echo is not initialized');
+            return;
+        }
+
+        listenersRef.current.forEach(({ channel }) => {
+            console.log(`Stopping listener on channel: ${channel}`);
+            window.Echo.leaveChannel(channel);
+        });
+
+        listenersRef.current = [];
+    };
 
     return {
         listen,
@@ -52,7 +70,7 @@ export const useTicketEcho = (
     userId: number,
     onTicketCreated: (data: any) => void,
     onTicketUpdated: (data: any) => void,
-    onTicketDerived?: (data: any) => void
+    onTicketDerived?: (data: any) => void,
 ): EchoHookResult => {
     const channels: EchoChannel[] = [
         {

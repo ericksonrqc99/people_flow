@@ -46,54 +46,73 @@ export default function FirstScreen({ setData, data }: props) {
     };
 
     return (
-        <div className="h-full">
-            <header className="flex justify-center h-1/2 ">
-                <img
-                    src="assets/images/escudo-muni.png"
-                    className="object-contain w-full h-full"
-                    alt="Escudo de la municipalidad distrital de San Miguel"
-                />
-            </header>
-            <section className="flex justify-center h-1/2 ">
-                <div className="w-1/2 flex flex-col gap-y-6 justify-center">
-                    <h1 className="text-center font-semibold text-4xl text-custom-foreground">
-                        Genera tu ticket
+        <div className="flex flex-col justify-center items-center min-h-full gap-8">
+            <div className="w-full max-w-md">
+                {/* Logo section */}
+                <div className="flex justify-center mb-8">
+                    <img
+                        src="/assets/images/escudo-muni.png"
+                        className="h-32 w-32 object-contain"
+                        alt="Escudo de la municipalidad distrital de San Miguel"
+                    />
+                </div>
+
+                {/* Main Card */}
+                <div className="bg-white rounded-lg shadow-lg p-8 border-t-4 border-t-blue-600">
+                    <h1 className="text-center font-bold text-3xl text-gray-800 mb-6">
+                        Generar Ticket
                     </h1>
-                    <input
-                        onChange={(e) => {
-                            handleOnChangeInput(e);
-                        }}
-                        value={data.citizen.document_number}
-                        autoFocus
-                        type="text"
-                        placeholder="Ingresa tu DNI"
-                        className="shadow-inner  text-center text-4xl h-14 border-1 border-custom-input-border rounded-md"
-                    ></input>
-                    <div className="h-14">
+
+                    <div className="mb-6">
+                        <label className="block text-sm font-semibold text-gray-700 mb-3">
+                            Número de DNI
+                        </label>
+                        <input
+                            onChange={(e) => {
+                                handleOnChangeInput(e);
+                            }}
+                            value={data.citizen.document_number}
+                            autoFocus
+                            type="text"
+                            placeholder="Ej: 12345678"
+                            className="w-full text-center text-2xl px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-600 focus:outline-none transition-colors"
+                        />
+                    </div>
+
+                    {/* Status messages */}
+                    <div className="h-24 flex items-center justify-center">
                         {isLoading ? (
-                            <div className="text-center">
-                                <span className="loader"></span>
+                            <div className="flex flex-col items-center gap-2">
+                                <div className="animate-spin">
+                                    <div className="h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full"></div>
+                                </div>
+                                <span className="text-gray-600">Buscando DNI...</span>
                             </div>
                         ) : data.citizen.ok ? (
-                            <p className="text-3xl text-center font-semibold text-custom-900">
-                                {capitalizeFirstLetter(data.citizen.names)}{' '}
-                                {capitalizeFirstLetter(
-                                    data.citizen.first_surname,
-                                )}{' '}
-                                {capitalizeFirstLetter(
-                                    data.citizen.second_surname,
-                                )}
-                            </p>
+                            <div className="text-center p-4 bg-green-50 border border-green-200 rounded-lg w-full">
+                                <p className="text-sm text-gray-600 mb-2">Ciudadano encontrado:</p>
+                                <p className="text-lg font-semibold text-green-700">
+                                    {capitalizeFirstLetter(data.citizen.names)}{' '}
+                                    {capitalizeFirstLetter(
+                                        data.citizen.first_surname,
+                                    )}{' '}
+                                    {capitalizeFirstLetter(
+                                        data.citizen.second_surname,
+                                    )}
+                                </p>
+                            </div>
                         ) : (
                             error && (
-                                <p className="text-xl text-center text-red-500 font-semibold">
-                                    {error}
-                                </p>
+                                <div className="text-center p-4 bg-red-50 border border-red-200 rounded-lg w-full">
+                                    <p className="text-red-700 font-semibold">
+                                        ⚠ {error}
+                                    </p>
+                                </div>
                             )
                         )}
                     </div>
                 </div>
-            </section>
+            </div>
         </div>
     );
 }

@@ -17,7 +17,6 @@ export default defineConfig({
     esbuild: {
         jsx: 'automatic',
     },
-
     server: {
         host: '0.0.0.0',
         port: 5173,
@@ -26,7 +25,7 @@ export default defineConfig({
             origin: '*', // esto es lo que activa Access-Control-Allow-Origin
         },
         hmr: {
-            host: '192.168.101.36', // tu IP en la red local
+            host: 'localhost', // tu IP en la red local
         },
     },
     cors: {

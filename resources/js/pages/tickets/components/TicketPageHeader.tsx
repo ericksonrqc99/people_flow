@@ -79,13 +79,15 @@ export default function TicketPageHeader({ userName, areaName }: TicketPageHeade
     if (!isVisible) {
         return (
             <>
-                <div className="flex items-center justify-between bg-gray-50 px-4 py-2 rounded-lg border">
-                    <div className="flex items-center space-x-2">
-                        <User className="w-4 h-4 text-gray-600" />
-                        <span className="text-sm font-medium text-gray-700">{userName}</span>
+                <div className="flex items-center justify-between bg-white px-6 py-3 rounded-lg border border-gray-200 shadow-sm">
+                    <div className="flex items-center space-x-3">
+                        <div className="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-lg">
+                            <User className="w-4 h-4 text-blue-600" />
+                        </div>
+                        <span className="font-medium text-gray-800">{userName}</span>
                         {areaName && (
                             <>
-                                <span className="text-gray-400">•</span>
+                                <span className="text-gray-300">|</span>
                                 <span className="text-sm text-gray-600">{areaName}</span>
                             </>
                         )}
@@ -95,24 +97,23 @@ export default function TicketPageHeader({ userName, areaName }: TicketPageHeade
                             variant="ghost"
                             size="sm"
                             onClick={() => setIsVisible(true)}
-                            className="h-6 px-2"
+                            className="h-8 px-3 text-blue-600 hover:bg-blue-50"
                         >
-                            <Eye className="w-3 h-3 mr-1" />
+                            <Eye className="w-4 h-4 mr-1" />
                             <span className="text-xs">Mostrar</span>
                         </Button>
                         <Button
                             variant="ghost"
                             size="sm"
                             onClick={handleLogout}
-                            className="h-6 px-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+                            className="h-8 px-3 text-red-600 hover:bg-red-50"
                             title="Cerrar sesión"
                         >
-                            <LogOut className="w-3 h-3" />
+                            <LogOut className="w-4 h-4" />
                         </Button>
                     </div>
                 </div>
                 
-                {/* Modal de confirmación de logout */}
                 <LogoutConfirmationModal
                     isOpen={showLogoutModal}
                     onConfirm={handleLogoutConfirm}
@@ -125,73 +126,80 @@ export default function TicketPageHeader({ userName, areaName }: TicketPageHeade
 
     return (
         <>
-            <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 relative">
-                <CardContent className="pt-6">
-                    {/* Botón para ocultar */}
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setIsVisible(false)}
-                        className="absolute top-2 right-2 h-6 w-6 p-0 hover:bg-green-100"
-                        title="Ocultar header"
-                    >
-                        <X className="w-3 h-3" />
-                    </Button>
-
+            {/* AdminLTE Style Header */}
+            <div className="bg-white border-b-2 border-blue-600 shadow-md rounded-lg overflow-hidden">
+                <div className="px-6 py-4">
                     <div className="flex items-center justify-between">
-                        <div className="space-y-3">
-                            {/* Saludo personalizado */}
-                            <div className="flex items-center space-x-3">
-                                <div className="flex items-center justify-center w-12 h-12 bg-green-100 rounded-full">
-                                    <User className="w-6 h-6 text-green-600" />
+                        {/* Left Section */}
+                        <div className="flex items-center space-x-6">
+                            {/* User Info */}
+                            <div className="flex items-center space-x-4">
+                                <div className="flex items-center justify-center w-12 h-12 bg-blue-600 text-white rounded-lg font-bold">
+                                    {userName.charAt(0).toUpperCase()}
                                 </div>
                                 <div>
-                                    <h1 className="text-2xl font-bold text-gray-900">
-                                        ¡Hola, {userName}!
-                                    </h1>
-                                    <p className="text-sm text-gray-600">
-                                        Bienvenido a tu área de trabajo
+                                    <h2 className="text-lg font-bold text-gray-800">
+                                        {userName}
+                                    </h2>
+                                    <p className="text-xs text-gray-500">
+                                        Panel de Gestión de Tickets
                                     </p>
                                 </div>
                             </div>
-                            
-                            {/* Información del área */}
+
+                            {/* Area Badge */}
                             {areaName && (
-                                <div className="flex items-center space-x-2">
-                                    <Building2 className="w-4 h-4 text-green-600" />
-                                    <Badge variant="secondary" className="bg-green-100 text-green-800">
-                                        {areaName}
-                                    </Badge>
+                                <div className="flex items-center space-x-2 pl-4 border-l border-gray-300">
+                                    <Building2 className="w-4 h-4 text-blue-600" />
+                                    <div>
+                                        <p className="text-xs text-gray-600">Área Asignada</p>
+                                        <p className="text-sm font-semibold text-gray-800">
+                                            {areaName}
+                                        </p>
+                                    </div>
                                 </div>
                             )}
                         </div>
-                        
-                        {/* Información de tiempo y logout */}
-                        <div className="text-right space-y-3">
-                            <div className="flex items-center space-x-2 text-sm text-gray-600">
-                                <Clock className="w-4 h-4" />
-                                <span>{currentTime}</span>
+
+                        {/* Right Section */}
+                        <div className="flex items-center space-x-6">
+                            {/* Time Info */}
+                            <div className="flex items-center space-x-2 text-right pl-6 border-l border-gray-300">
+                                <Clock className="w-4 h-4 text-gray-600" />
+                                <div>
+                                    <p className="text-xs text-gray-600">Hora Actual</p>
+                                    <p className="text-sm font-semibold text-gray-800">
+                                        {currentTime}
+                                    </p>
+                                </div>
                             </div>
-                            <p className="text-xs text-gray-500">
-                                Sistema de gestión de tickets
-                            </p>
-                            
-                            {/* Botón de logout */}
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={handleLogout}
-                                className="bg-white/70 hover:bg-red-50 border-red-200 text-red-600 hover:text-red-700 hover:border-red-300 transition-all duration-200"
-                            >
-                                <LogOut className="w-4 h-4 mr-2" />
-                                Cerrar sesión
-                            </Button>
+
+                            {/* Actions */}
+                            <div className="flex items-center space-x-2 pl-6 border-l border-gray-300">
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setIsVisible(false)}
+                                    className="h-8 w-8 p-0 text-gray-600 hover:bg-gray-100"
+                                    title="Ocultar header"
+                                >
+                                    <X className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={handleLogout}
+                                    className="h-8 px-3 text-red-600 hover:bg-red-50 font-medium"
+                                >
+                                    <LogOut className="w-4 h-4 mr-2" />
+                                    Salir
+                                </Button>
+                            </div>
                         </div>
                     </div>
-                </CardContent>
-            </Card>
+                </div>
+            </div>
             
-            {/* Modal de confirmación de logout */}
             <LogoutConfirmationModal
                 isOpen={showLogoutModal}
                 onConfirm={handleLogoutConfirm}

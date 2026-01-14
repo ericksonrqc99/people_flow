@@ -13,34 +13,32 @@ export default function ActiveTicketBanner({
     onViewTicket 
 }: ActiveTicketBannerProps) {
     return (
-        <Card className="border-orange-300 bg-gradient-to-r from-orange-50 to-amber-50 shadow-md">
-            <CardContent className="pt-6">
+        <Card className="border-l-4 border-l-yellow-500 bg-gradient-to-r from-yellow-50 to-amber-50 shadow-lg">
+            <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
-                        <div className="flex items-center space-x-3">
-                            <div className="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-full animate-pulse">
-                                <AlertTriangle className="h-6 w-6 text-orange-600" />
-                            </div>
-                            <div>
-                                <h3 className="font-bold text-orange-800 text-lg">
-                                    Ticket en atención activa
-                                </h3>
-                                <p className="text-sm text-orange-700 font-medium">
-                                    {currentActiveTicket.visible_code} - {[
-                                        currentActiveTicket.citizen?.names,
-                                        currentActiveTicket.citizen?.first_surname,
-                                        currentActiveTicket.citizen?.second_surname
-                                    ].filter(Boolean).join(' ')}
-                                </p>
-                                <p className="text-xs text-orange-600 mt-1">
-                                    Continúa atendiendo a este ciudadano
-                                </p>
-                            </div>
+                        <div className="flex items-center justify-center w-14 h-14 bg-yellow-200 rounded-lg animate-pulse">
+                            <AlertTriangle className="h-7 w-7 text-yellow-700" />
+                        </div>
+                        <div>
+                            <h3 className="font-bold text-gray-800 text-lg">
+                                ⚠️ Ticket en atención activa
+                            </h3>
+                            <p className="text-sm text-gray-700 font-semibold">
+                                {currentActiveTicket.visible_code} - {[
+                                    currentActiveTicket.citizen?.names,
+                                    currentActiveTicket.citizen?.first_surname,
+                                    currentActiveTicket.citizen?.second_surname
+                                ].filter(Boolean).join(' ')}
+                            </p>
+                            <p className="text-xs text-gray-600 mt-1">
+                                Continúa atendiendo a este ciudadano
+                            </p>
                         </div>
                     </div>
                     <Button
                         onClick={onViewTicket}
-                        className="bg-orange-600 hover:bg-orange-700 text-white shadow-md hover:shadow-lg transition-all duration-200"
+                        className="bg-yellow-600 hover:bg-yellow-700 text-white shadow-md font-semibold"
                     >
                         <Eye className="h-4 w-4 mr-2" />
                         Continuar atención

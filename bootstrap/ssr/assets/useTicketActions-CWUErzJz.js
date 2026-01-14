@@ -1,24 +1,37 @@
-import { useEchoPublic } from "@laravel/echo-react";
-import { useCallback } from "react";
+import { useRef } from "react";
 import axios from "axios";
 import { T } from "../ssr.js";
 import { z } from "zod";
 const useMultipleEchoPublic = (channels) => {
-  const echoHooks = channels.map(
-    ({ channel, event, callback }) => useEchoPublic(channel, event, callback)
-  );
-  const listen = useCallback(() => {
-    echoHooks.forEach((hook) => hook.listen());
-  }, [echoHooks]);
-  const stopListening = useCallback(() => {
-    echoHooks.forEach((hook) => hook.stopListening());
-  }, [echoHooks]);
+  const listenersRef = useRef([]);
+  const listen = () => {
+    if (!window.Echo) {
+      console.error("Echo is not initialized");
+      return;
+    }
+    channels.forEach(({ channel, event, callback }) => {
+      console.log(`Listening to channel: ${channel}, event: ${event}`);
+      const listener = window.Echo.channel(channel).listen(event, callback);
+      listenersRef.current.push({ channel, event, listener });
+    });
+  };
+  const stopListening = () => {
+    if (!window.Echo) {
+      console.error("Echo is not initialized");
+      return;
+    }
+    listenersRef.current.forEach(({ channel }) => {
+      console.log(`Stopping listener on channel: ${channel}`);
+      window.Echo.leaveChannel(channel);
+    });
+    listenersRef.current = [];
+  };
   return {
     listen,
     stopListening
   };
 };
-const useTicketEcho = (userId, onTicketCreated, onTicketUpdated) => {
+const useTicketEcho = (userId, onTicketCreated, onTicketUpdated, onTicketDerived) => {
   const channels = [
     {
       channel: `ticket-created.${userId}`,
@@ -31,6 +44,13 @@ const useTicketEcho = (userId, onTicketCreated, onTicketUpdated) => {
       callback: onTicketUpdated
     }
   ];
+  if (onTicketDerived) {
+    channels.push({
+      channel: `ticket-derived.${userId}`,
+      event: "TicketDerived",
+      callback: onTicketDerived
+    });
+  }
   return useMultipleEchoPublic(channels);
 };
 const TicketSchema = z.object({

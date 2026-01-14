@@ -34,21 +34,29 @@ class CitizenResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Toggle::make('is_active')
-                    ->label(__('Estado'))
-                    ->onColor('success')
-                    ->offColor('danger')
-                    ->onIcon('heroicon-o-check')
-                    ->offIcon('heroicon-o-x-mark')
-                    ->default(true)
-                    ->columnSpanFull(),
+                Forms\Components\Section::make('Estado del Ciudadano')
+                    ->schema([
+                        Forms\Components\Toggle::make('is_active')
+                            ->label(__('Estado'))
+                            ->onColor('success')
+                            ->offColor('danger')
+                            ->onIcon('heroicon-o-check')
+                            ->offIcon('heroicon-o-x-mark')
+                            ->default(true)
+                            ->columnSpanFull(),
+                    ])
+                    ->collapsible(),
+
                 Forms\Components\Fieldset::make(__('Buscador por DNI'))
+                    ->columns(3)
                     ->schema([
                         Forms\Components\TextInput::make('document_number')
                             ->label(__('DNI'))
                             ->required()
                             ->unique(ignoreRecord: true)
                             ->validationMessages(['unique' => 'El DNI ya está siendo usado'])
+                            ->placeholder('Ingresa el DNI del ciudadano')
+                            ->helperText('Identificación única del ciudadano')
                             ->suffixActions([
                                 Forms\Components\Actions\Action::make('search-citizen')
                                     ->action(function (Set $set, $state) {
@@ -107,69 +115,101 @@ class CitizenResource extends Resource
                                 fn(Set $set) => $set('isReadOnlyCitizenData', false)
                             )
                             ->live()
-                            ->numeric(),
-                    ])->columns(3)
-                    ->hidden(fn(string $operation) => $operation === 'edit'),
-                Forms\Components\Fieldset::make(__('Datos'))->schema([
-                    Forms\Components\Hidden::make('isReadOnlyCitizenData')
-                        ->default(false)
-                        ->disabled()
-                        ->live(),
-                    Forms\Components\TextInput::make('names')
-                        ->label(__('Nombres'))
-                        ->required()
-                        ->readOnly(fn(Get $get) => $get('isReadOnlyCitizenData'))
-                        ->maxLength(100),
-                    Forms\Components\TextInput::make('first_surname')
-                        ->label(__('Primer Apellido'))
-                        ->required()
-                        ->readOnly(fn(Get $get) => $get('isReadOnlyCitizenData'))
-                        ->maxLength(100),
-                    Forms\Components\TextInput::make('second_surname')
-                        ->label(__('Segundo Apellido'))
-                        ->readOnly(fn(Get $get) => $get('isReadOnlyCitizenData'))
-                        ->maxLength(100),
-                    Forms\Components\TextInput::make('departament')
-                        ->label(__('Departamento'))
-                        ->readOnly(fn(Get $get) => $get('isReadOnlyCitizenData'))
-                        ->maxLength(100),
-                    Forms\Components\TextInput::make('province')
-                        ->label(__('Provincia'))
-                        ->readOnly(fn(Get $get) => $get('isReadOnlyCitizenData'))
-                        ->maxLength(100),
-                    Forms\Components\TextInput::make('district')
-                        ->label(__('Distrito'))
-                        ->readOnly(fn(Get $get) => $get('isReadOnlyCitizenData'))
-                        ->maxLength(100),
-                    Forms\Components\TextInput::make('address')
-                        ->label(__('Dirección'))
-                        ->readOnly(fn(Get $get) => $get('isReadOnlyCitizenData'))
-                        ->maxLength(100),
-                ])
-            ]);
+                            ->numeric()
+                            ->columnSpan(3)
+                            ->hidden(fn(string $operation) => $operation === 'edit'),
+                    ]),
+
+                Forms\Components\Fieldset::make(__('Datos Personales'))
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\Hidden::make('isReadOnlyCitizenData')
+                            ->default(false)
+                            ->disabled()
+                            ->live(),
+                        Forms\Components\TextInput::make('names')
+                            ->label(__('Nombres'))
+                            ->required()
+                            ->readOnly(fn(Get $get) => $get('isReadOnlyCitizenData'))
+                            ->maxLength(100)
+                            ->placeholder('Nombres del ciudadano')
+                            ->helperText('Nombres de pila del ciudadano registrados en el documento de identidad')
+                            ->columnSpan(1),
+                        Forms\Components\TextInput::make('first_surname')
+                            ->label(__('Primer Apellido'))
+                            ->required()
+                            ->readOnly(fn(Get $get) => $get('isReadOnlyCitizenData'))
+                            ->maxLength(100)
+                            ->placeholder('Primer apellido')
+                            ->helperText('Primer apellido paterno del ciudadano')
+                            ->columnSpan(1),
+                        Forms\Components\TextInput::make('second_surname')
+                            ->label(__('Segundo Apellido'))
+                            ->readOnly(fn(Get $get) => $get('isReadOnlyCitizenData'))
+                            ->maxLength(100)
+                            ->placeholder('Segundo apellido (opcional)')
+                            ->helperText('Segundo apellido materno del ciudadano (si aplica)')
+                            ->columnSpan(1),
+                    ]),
+
+                Forms\Components\Fieldset::make(__('Ubicación'))
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\TextInput::make('departament')
+                            ->label(__('Departamento'))
+                            ->readOnly(fn(Get $get) => $get('isReadOnlyCitizenData'))
+                            ->maxLength(100)
+                            ->placeholder('Departamento/Región')
+                            ->helperText('Región o departamento de residencia del ciudadano')
+                            ->columnSpan(1),
+                        Forms\Components\TextInput::make('province')
+                            ->label(__('Provincia'))
+                            ->readOnly(fn(Get $get) => $get('isReadOnlyCitizenData'))
+                            ->maxLength(100)
+                            ->placeholder('Provincia')
+                            ->helperText('Provincia dentro del departamento de residencia')
+                            ->columnSpan(1),
+                        Forms\Components\TextInput::make('district')
+                            ->label(__('Distrito'))
+                            ->readOnly(fn(Get $get) => $get('isReadOnlyCitizenData'))
+                            ->maxLength(100)
+                            ->placeholder('Distrito')
+                            ->helperText('Distrito o localidad de residencia del ciudadano')
+                            ->columnSpan(1),
+                        Forms\Components\TextInput::make('address')
+                            ->label(__('Dirección'))
+                            ->readOnly(fn(Get $get) => $get('isReadOnlyCitizenData'))
+                            ->maxLength(100)
+                            ->placeholder('Dirección completa')
+                            ->helperText('Domicilio exacto del ciudadano para correspondencia')
+                            ->columnSpanFull(),
+                    ]),
+            ])
+            ->columns(1);
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->deferLoading()
+            ->paginationPageOptions([5, 20, 50, 100])
             ->columns([
                 Tables\Columns\TextColumn::make('document_number')
                     ->label(__('DNI'))
-                    ->sortable(),
+                    ->searchable()
+                    ->sortable()
+                    ->weight('bold'),
                 Tables\Columns\TextColumn::make('names')
                     ->label(__('Nombres'))
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('first_surname')
                     ->label(__('Primer Apellido'))
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('second_surname')
                     ->label(__('Segundo Apellido'))
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('date_of_birth')
-                    ->label(__('Fecha de nacimiento'))
-                    ->date()
-                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('is_active')
                     ->label(__('Estado'))
@@ -181,12 +221,15 @@ class CitizenResource extends Resource
                     ->formatStateUsing(fn(int $state): string => match ($state) {
                         0 => 'inactivo',
                         1 => 'activo'
-                    }),
+                    })
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('Creado'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
+                    ->label(__('Actualizado'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

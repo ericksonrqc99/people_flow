@@ -10,15 +10,17 @@ export default function Searcher({
     setSearchTerm: (value: string) => void;
 }) {
     return (
-        <Card>
-            <CardContent className="pt-6">
+        <Card className="border-none shadow-md">
+            <CardContent className="p-6">
                 <div className="relative max-w-md">
-                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <div className="absolute left-3 top-3 text-gray-400">
+                        <Search className="h-5 w-5" />
+                    </div>
                     <Input
-                        placeholder="Buscar por código o solicitante..."
+                        placeholder="🔍 Buscar por código, DNI o nombre..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-8"
+                        className="pl-10 py-2.5 border-2 border-gray-300 rounded-lg focus:border-blue-600 focus:ring-2 focus:ring-blue-200 text-sm font-medium"
                     />
                 </div>
             </CardContent>

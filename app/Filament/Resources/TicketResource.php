@@ -35,7 +35,7 @@ class TicketResource extends Resource
                                     ->dehydrated(false)
                                     ->placeholder('Se genera automáticamente')
                                     ->helperText('Código único del sistema'),
-                                
+
                                 Forms\Components\TextInput::make('visible_code')
                                     ->label('Código Visible')
                                     ->disabled()
@@ -44,7 +44,7 @@ class TicketResource extends Resource
                                     ->helperText('Código que ve el ciudadano'),
                             ]),
                     ])
-                    ->hidden(fn (string $operation): bool => $operation === 'create')
+                    ->hidden(fn(string $operation): bool => $operation === 'create')
                     ->collapsible(),
 
                 // Información del Ticket
@@ -60,7 +60,7 @@ class TicketResource extends Resource
                             ->required()
                             ->helperText('Área responsable del ticket')
                             ->columnSpan(1),
-                        
+
                         Forms\Components\Select::make('status_id')
                             ->label('Estado del Ticket')
                             ->relationship('status', 'type', function ($query) {
@@ -87,8 +87,8 @@ class TicketResource extends Resource
                             ->getOptionLabelFromRecordUsing(function ($record) {
                                 $fullName = trim(
                                     ($record->names ?? '') . ' ' .
-                                    ($record->first_surname ?? '') . ' ' .
-                                    ($record->second_surname ?? '')
+                                        ($record->first_surname ?? '') . ' ' .
+                                        ($record->second_surname ?? '')
                                 );
 
                                 $document = $record->document_number ? " (Doc: {$record->document_number})" : '';
@@ -115,7 +115,7 @@ class TicketResource extends Resource
                             ->required()
                             ->helperText('Usuario que registra el ticket')
                             ->columnSpan(1),
-                        
+
                         Forms\Components\Select::make('attended_by_id')
                             ->label('Asignado a')
                             ->relationship('attendedBy', 'name')
@@ -135,7 +135,7 @@ class TicketResource extends Resource
                             ->helperText('Momento en que el ciudadano es admitido')
                             ->seconds(false)
                             ->columnSpan(1),
-                        
+
                         Forms\Components\DateTimePicker::make('time_departure')
                             ->label('Hora de Salida')
                             ->helperText('Momento en que el ciudadano se retira')
@@ -162,10 +162,14 @@ class TicketResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->paginationPageOptions([5, 20, 50, 100])
+            ->deferLoading()
             ->columns([
                 Tables\Columns\TextColumn::make('code')
+                    ->label('Código Interno')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('visible_code')
+                    ->label('Código Visible')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('area.name')
                     ->numeric()
@@ -178,7 +182,7 @@ class TicketResource extends Resource
 
                         return $citizen->full_name ?: 'Sin nombre';
                     })
-                    ->searchable(['citizen.names', 'citizen.first_surname', 'citizen.second_surname'])
+                    ->searchable(['citizens.names', 'citizens.first_surname', 'citizens.second_surname'])
                     ->sortable()
                     ->limit(30)
                     ->tooltip(function ($record): ?string {
@@ -190,9 +194,11 @@ class TicketResource extends Resource
                             "Email: " . ($citizen->email ?? 'N/A');
                     }),
                 Tables\Columns\TextColumn::make('registeredBy.name')
+                    ->label(__('Registrado por'))
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('attendedBy.name')
+                    ->label(__('Atendido por'))
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status.type')
@@ -216,16 +222,20 @@ class TicketResource extends Resource
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('time_admission')
+                    ->label(__('Ingreso'))
                     ->dateTime()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('time_departure')
+                    ->label(__('Salida'))
                     ->dateTime()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('Creado'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
+                    ->label(__('Actualizado'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

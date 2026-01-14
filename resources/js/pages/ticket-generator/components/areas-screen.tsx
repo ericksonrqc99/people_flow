@@ -33,30 +33,36 @@ export default function AreasScreen({
 }: props) {
     return (
         <div className="flex flex-col gap-y-6 items-center">
-            <h1 className="text-center text-4xl font-semibold text-custom-foreground">{title}</h1>
-            <section className="flex flex-col justify-between items-center gap-y-6">
-                <div className="grid grid-cols-4 gap-2 w-10/12">
+            <div className="w-full max-w-5xl">
+                {/* Header */}
+                <div className="bg-white rounded-lg shadow-md border-l-4 border-l-blue-600 p-6 mb-6">
+                    <h1 className="text-3xl font-bold text-gray-800 text-center">
+                        {title}
+                    </h1>
+                </div>
+
+                {/* Grid de áreas */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     {areas.map((area) => (
                         <BoxContent
                             area={area}
-                            className="text-2xl"
                             key={area.id}
                             screen={screen}
                             setScreen={setScreen}
                             setSelectedAreas={setSelectedAreas}
                             selectedAreas={selectedAreas}
-                        ></BoxContent>
+                        />
                     ))}
                     {screen === 'gerencias' && (
                         <button
                             onClick={() => setScreen('oficinas')}
-                            className="text-2xl font-semibold p-4 rounded-md cursor-pointer text-custom-button-text bg-custom-foreground "
+                            className="p-4 rounded-lg cursor-pointer text-white bg-gradient-to-br from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 font-semibold shadow-md transition-all h-32 flex items-center justify-center text-center"
                         >
                             Ver Oficinas
                         </button>
                     )}
                 </div>
-            </section>
+            </div>
         </div>
     );
 }

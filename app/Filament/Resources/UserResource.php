@@ -8,6 +8,7 @@ use App\Models\Area;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -26,52 +27,84 @@ class UserResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Toggle::make('is_active')
-                    ->label(__('Estado'))
-                    ->onColor('success')
-                    ->offColor('danger')
-                    ->onIcon('heroicon-o-check')
-                    ->offIcon('heroicon-o-x-mark')
-                    ->columnSpanFull()
-                    ->default(true)
-                    ->required(),
-                Forms\Components\Tabs::make('Tabs')->tabs([
-                    Forms\Components\Tabs\Tab::make('Datos del usuario')->schema([
+                Forms\Components\Section::make('Estado del Usuario')
+                    ->schema([
+                        Forms\Components\Toggle::make('is_active')
+                            ->label(__('Estado'))
+                            ->onColor('success')
+                            ->offColor('danger')
+                            ->onIcon('heroicon-o-check')
+                            ->offIcon('heroicon-o-x-mark')
+                            ->columnSpanFull()
+                            ->default(true)
+                            ->required(),
+                    ])
+                    ->collapsible(),
+
+                Forms\Components\Fieldset::make('Datos del Usuario')
+                    ->columns(2)
+                    ->schema([
                         Forms\Components\TextInput::make('name')
                             ->label(__('Nombre Completo'))
                             ->required()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->placeholder('Ingresa el nombre completo')
+                            ->helperText('Nombre y apellido del usuario administrativo')
+                            ->columnSpanFull(),
                         Forms\Components\TextInput::make('email')
                             ->label(__('Correo'))
                             ->email()
                             ->required()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->placeholder('Ingresa un correo válido')
+                            ->helperText('Correo electrónico único para acceder al panel administrativo')
+                            ->columnSpan(1),
                         Forms\Components\TextInput::make('password')
                             ->label(__('Contraseña'))
                             ->password()
                             ->required(fn(string $operation) => $operation === 'create')
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->live()
+                            ->placeholder('Contraseña segura')
+                            ->helperText(fn(string $operation) => $operation === 'create' ? 'Contraseña inicial del usuario' : 'Dejar en blanco para mantener la contraseña actual')
+                            ->columnSpan(1),
+                        Forms\Components\TextInput::make('password_confirmation')
+                            ->label(__('Confirmar Contraseña'))
+                            ->password()
+                            ->maxLength(255)
+                            ->placeholder('Repetir la contraseña')
+                            ->helperText(fn(string $operation) => $operation === 'create' ? 'Confirmar contraseña inicial del usuario' : 'Dejar en blanco para mantener la contraseña actual')
+                            ->requiredWith('password')
+                            ->same('password'),
                     ]),
-                    Forms\Components\Tabs\Tab::make('Area')->schema([
+
+                Forms\Components\Fieldset::make('Asignación de Área')
+                    ->columns(1)
+                    ->schema([
                         Forms\Components\Select::make('area_id')
-                            ->label(__('Area'))
+                            ->label(__('Área'))
                             ->searchable()
                             ->options(fn() => Area::all()->pluck('name', 'id'))
                             ->preload()
-                            ->relationship('area', 'name'),
+                            ->relationship('area', 'name')
+                            ->placeholder('Selecciona un área')
+                            ->helperText('Área departamental donde labora el usuario'),
                     ]),
-                    Forms\Components\Tabs\Tab::make('Roles')->schema([
+
+                Forms\Components\Fieldset::make('Permisos y Roles')
+                    ->columns(1)
+                    ->schema([
                         Forms\Components\Select::make('roles')
                             ->multiple()
-                            ->label(__('Rol'))
+                            ->label(__('Roles'))
                             ->preload()
                             ->options(fn() => Role::all()->pluck('name', 'id'))
-                            ->relationship('roles', 'name'),
-                    ])
-
-                ])->columnSpanFull()
-
-            ]);
+                            ->relationship('roles', 'name')
+                            ->placeholder('Selecciona uno o más roles')
+                            ->helperText('Roles que definen los permisos y funcionalidades del usuario'),
+                    ]),
+            ])
+            ->columns(1);
     }
 
 
@@ -80,21 +113,32 @@ class UserResource extends Resource
     {
         return $table
             ->deferLoading()
-            ->modifyQueryUsing(fn (Builder $query) => $query->where('id', '!=', Auth::id()))
+            ->paginationPageOptions([5, 20, 50, 100])
+            ->modifyQueryUsing(fn(Builder $query) => $query->where('id', '!=', Auth::id()))
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('Nombre'))
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable()
+                    ->weight('bold'),
                 Tables\Columns\TextColumn::make('email')
                     ->label(__('Correo'))
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable()
+                    ->copyable(),
                 Tables\Columns\TextColumn::make('area.name')
-                    ->label(__('Area'))
+                    ->label(__('Área'))
                     ->badge()
-                    ->color('warning')
-                    ->numeric()
+                    ->color('primary')
                     ->searchable()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('roles.name')
+                    ->label(__('Roles'))
+                    ->badge()
+                    ->color('secondary')
+                    ->separator(', ')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('is_active')
                     ->label(__('Estado'))
                     ->badge()
@@ -105,7 +149,8 @@ class UserResource extends Resource
                     ->formatStateUsing(fn(int $state): string => match ($state) {
                         0 => 'inactivo',
                         1 => 'activo'
-                    }),
+                    })
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('Creado'))
                     ->dateTime()

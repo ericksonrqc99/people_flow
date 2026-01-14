@@ -167,26 +167,38 @@ export default function TicketGenerator({ areas }: props) {
 
     return (
         <GuestLayout className="font-inter">
-            <div className="bg-custom-background w-full h-full p-4 select-none">
+            <div className="bg-slate-50 w-full h-full p-6 select-none">
+                {/* Header AdminLTE style */}
+                <div className="mb-6 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <img
+                            src="/assets/images/escudo-muni.png"
+                            alt="Logo"
+                            className="h-12 w-12"
+                        />
+                        <h2 className="text-2xl font-bold text-gray-800">
+                            Sistema de Tickets
+                        </h2>
+                    </div>
+                </div>
+
                 {/* back screen button*/}
                 {screen !== 'search-citizen' ? (
-                    <div className="flex text-cust h-1/15 justify-between items-center">
-                        <div
-                            className=" h-full flex items-center bg-custom-foreground text-custom-button-text rounded-md"
+                    <div className="mb-4 h-auto flex justify-start">
+                        <button
+                            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2 font-semibold transition-colors"
                             onClick={handleClickBackArrow}
                         >
-                            <MoveLeft
-                                size={70}
-                                className="cursor-pointer p-2"
-                            />
-                        </div>
+                            <MoveLeft size={20} />
+                            Atrás
+                        </button>
                     </div>
                 ) : (
-                    <div className="h-1/15"></div>
+                    <div className="mb-4"></div>
                 )}
 
                 {/* render screen */}
-                <div className="h-12/15 w-full">
+                <div className="mb-6">
                     {screen === 'search-citizen' && (
                         <FirstScreen data={data} setData={setData} />
                     )}
@@ -234,11 +246,11 @@ export default function TicketGenerator({ areas }: props) {
                 </div>
                 {/* render screen */}
 
-                <div className="h-2/15 flex justify-center">
+                <div className="flex justify-center gap-4">
                     <button
                         disabled={handleDisabledButton()}
                         onClick={handleOnClickButton}
-                        className="bg-custom-foreground  rounded-md text-custom-button-text font-bold h-14 cursor-pointer text-2xl shadow-xl shadow-custom-700 w-1/2"
+                        className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed rounded-lg text-white font-bold h-12 cursor-pointer text-lg shadow-md transition-colors px-8"
                     >
                         {screen === 'search-citizen'
                             ? 'Continuar'

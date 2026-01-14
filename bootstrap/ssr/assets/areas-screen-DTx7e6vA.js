@@ -1,8 +1,5 @@
 import { jsxs, jsx } from "react/jsx-runtime";
-import BoxContent from "./box-content-bC64p33f.js";
-import "./utils-BMo_LHkK.js";
-import "clsx";
-import "tailwind-merge";
+import BoxContent from "./box-content-Cnn9_Run.js";
 function AreasScreen({
   areas,
   setScreen,
@@ -13,7 +10,7 @@ function AreasScreen({
 }) {
   return /* @__PURE__ */ jsxs("div", { className: "flex flex-col gap-y-6 items-center", children: [
     /* @__PURE__ */ jsx("h1", { className: "text-center text-4xl font-semibold text-custom-foreground", children: title }),
-    /* @__PURE__ */ jsx("section", { className: "flex flex-col justify-between items-center gap-y-6", children: /* @__PURE__ */ jsxs("div", { className: "grid grid-cols-6 gap-2 w-10/12", children: [
+    /* @__PURE__ */ jsx("section", { className: "flex flex-col justify-between items-center gap-y-6", children: /* @__PURE__ */ jsxs("div", { className: "grid grid-cols-4 gap-2 w-10/12", children: [
       areas.map((area) => /* @__PURE__ */ jsx(
         BoxContent,
         {

@@ -5,7 +5,7 @@ import axios from 'axios';
 import { route } from 'ziggy-js';
 import { useTicketEcho } from '@/hooks/useMultipleEcho';
 import { useTicketActions } from '@/hooks/useTicketActions';
-import { AvaibleTicketTypesT, Ticket, TicketStatusTypeT } from '@/types/general';
+import { Ticket } from '@/types/general';
 import { TicketSchema } from '@/schemas/ticket';
 
 // Components
@@ -72,17 +72,20 @@ export default function TicketsPage({ ...props }) {
     const notificationSound = useRef<HTMLAudioElement | null>(null);
 
     // Ticket actions hook
-    const { handleTakeTicket, handleCloseTicket, handleReleaseTicket } = useTicketActions({
-        user,
-        ticketTypes,
-        setTicketsData,
-        setFocusedTicket,
-        setHasActiveTicket,
-        setCurrentActiveTicket
-    });
+    const { handleTakeTicket, handleCloseTicket, handleReleaseTicket } =
+        useTicketActions({
+            user,
+            ticketTypes,
+            setTicketsData,
+            setFocusedTicket,
+            setHasActiveTicket,
+            setCurrentActiveTicket,
+        });
 
     // Handle ticket creation/update callbacks
     const handleTicketCreated = (e: { ticket: any }) => {
+        console.log('llego handleTicketCreated');
+
         const normalizedTicket = TicketSchema.parse(e.ticket);
         setTicketsData((prevTickets) => [normalizedTicket, ...prevTickets]);
         if (notificationSound.current) {
@@ -96,25 +99,32 @@ export default function TicketsPage({ ...props }) {
         const normalizedTicket = TicketSchema.parse(e.ticket);
         setTicketsData((prevTickets) =>
             prevTickets.map((prevTicket) => {
-                return prevTicket.id === normalizedTicket.id ? normalizedTicket : prevTicket;
+                return prevTicket.id === normalizedTicket.id
+                    ? normalizedTicket
+                    : prevTicket;
             }),
         );
     };
 
-    const handleTicketDerived = (e: { ticket: any; fromAreaId: number; reason: string; derivedByUserId: number }) => {
+    const handleTicketDerived = (e: {
+        ticket: any;
+        fromAreaId: number;
+        reason: string;
+        derivedByUserId: number;
+    }) => {
         const normalizedTicket = TicketSchema.parse(e.ticket);
         // Add the derived ticket to our area
         setTicketsData((prevTickets) => [normalizedTicket, ...prevTickets]);
-        
+
         // Show notification
         if (notificationSound.current) {
             notificationSound.current.play().catch(console.error);
         }
-        
+
         console.log('Ticket derivado recibido:', {
             ticket: normalizedTicket,
             fromAreaId: e.fromAreaId,
-            reason: e.reason
+            reason: e.reason,
         });
     };
 
@@ -122,7 +132,12 @@ export default function TicketsPage({ ...props }) {
     const {
         listen: listenToTicketChannels,
         stopListening: stopListeningToTicketChannels,
-    } = useTicketEcho(user.area.id, handleTicketCreated, handleTicketUpdated, handleTicketDerived);
+    } = useTicketEcho(
+        user.area.id,
+        handleTicketCreated,
+        handleTicketUpdated,
+        handleTicketDerived,
+    );
 
     useEffect(() => {
         listenToTicketChannels();
@@ -144,13 +159,19 @@ export default function TicketsPage({ ...props }) {
             const fullName = [
                 ticket.citizen?.names,
                 ticket.citizen?.first_surname,
-                ticket.citizen?.second_surname
-            ].filter(Boolean).join(' ').toLowerCase();
-            
+                ticket.citizen?.second_surname,
+            ]
+                .filter(Boolean)
+                .join(' ')
+                .toLowerCase();
+
             const searchLower = searchTerm.toLowerCase();
-            
-            const matchesSearch = fullName.includes(searchLower) ||
-                String(ticket.citizen?.document_number || '').includes(searchTerm) ||
+
+            const matchesSearch =
+                fullName.includes(searchLower) ||
+                String(ticket.citizen?.document_number || '').includes(
+                    searchTerm,
+                ) ||
                 ticket.visible_code?.toLowerCase().includes(searchLower);
 
             let matchesEstado = true;
@@ -189,14 +210,20 @@ export default function TicketsPage({ ...props }) {
             const result = await handleCloseTicket(focusedTicket, closeForm);
             if (result?.success) {
                 setShowCloseModal(false);
-                setCloseForm({ estado: 'cerrado' as 'cerrado' | 'cancelado', comentario: '' });
+                setCloseForm({
+                    estado: 'cerrado' as 'cerrado' | 'cancelado',
+                    comentario: '',
+                });
             }
         }
     };
 
     const onReleaseTicket = async () => {
         if (focusedTicket) {
-            const result = await handleReleaseTicket(focusedTicket, currentActiveTicket);
+            const result = await handleReleaseTicket(
+                focusedTicket,
+                currentActiveTicket,
+            );
             if (result?.success) {
                 setShowReleaseModal(false);
             }
@@ -217,24 +244,28 @@ export default function TicketsPage({ ...props }) {
                 if (result.ok) {
                     setShowDeriveModal(false);
                     setDeriveForm({ toAreaId: '', reason: '' });
-                    
+
                     // Remove ticket from current area since it was derived
-                    setTicketsData((prevTickets) => 
-                        prevTickets.filter(ticket => ticket.id !== focusedTicket.id)
+                    setTicketsData((prevTickets) =>
+                        prevTickets.filter(
+                            (ticket) => ticket.id !== focusedTicket.id,
+                        ),
                     );
-                    
+
                     // Clear focused ticket since it's no longer in this area
                     setFocusedTicket(null);
                     setHasActiveTicket(false);
                     setCurrentActiveTicket(null);
-                    
+
                     console.log('Ticket derivado exitosamente');
                 } else {
                     alert(result.message || 'Error al derivar el ticket');
                 }
             } catch (error) {
                 console.error('Error derivando ticket:', error);
-                alert('Error al derivar el ticket. Por favor intente nuevamente.');
+                alert(
+                    'Error al derivar el ticket. Por favor intente nuevamente.',
+                );
             }
         }
     };
@@ -248,99 +279,92 @@ export default function TicketsPage({ ...props }) {
     };
 
     return (
-        <div className="container mx-auto p-6 space-y-6">
-            {/* Audio */}
-            <audio
-                ref={notificationSound}
-                src="/assets/sounds/notification-new-ticket.mp3"
-                preload="auto"
-            />
-
-            {/* Header */}
-            <TicketPageHeader 
-                userName={user.name} 
-                areaName={user.area?.name} 
-            />
-
-            {/* Active Ticket Banner - solo mostrar si no hay focused ticket */}
-            {hasActiveTicket && currentActiveTicket && !focusedTicket && (
-                <ActiveTicketBanner 
-                    currentActiveTicket={currentActiveTicket}
-                    onViewTicket={onViewActiveTicket}
+        <div className="min-h-screen bg-gray-100 p-4 md:p-6">
+            <div className="max-w-7xl mx-auto space-y-6">
+                {/* Audio */}
+                <audio
+                    ref={notificationSound}
+                    src="/assets/sounds/notification-new-ticket.mp3"
+                    preload="auto"
                 />
-            )}
 
-            {/* Main Content */}
-            {focusedTicket ? (
-                <TicketFocusedView 
-                    ticket={focusedTicket}
-                    onClose={() => setShowCloseModal(true)}
-                    onRelease={() => setShowReleaseModal(true)}
-                    onDerive={() => setShowDeriveModal(true)}
+                {/* Header */}
+                <TicketPageHeader userName={user.name} areaName={user.area?.name} />
+
+                {/* Active Ticket Banner - solo mostrar si no hay focused ticket */}
+                {hasActiveTicket && currentActiveTicket && !focusedTicket && (
+                    <ActiveTicketBanner
+                        currentActiveTicket={currentActiveTicket}
+                        onViewTicket={onViewActiveTicket}
+                    />
+                )}
+
+                {/* Main Content */}
+                {focusedTicket ? (
+                    <TicketFocusedView
+                        ticket={focusedTicket}
+                        onClose={() => setShowCloseModal(true)}
+                        onRelease={() => setShowReleaseModal(true)}
+                        onDerive={() => setShowDeriveModal(true)}
+                    />
+                ) : hasActiveTicket && !focusedTicket ? (
+                    <ActiveTicketMessage />
+                ) : (
+                    <>
+                        <Searcher
+                            searchTerm={searchTerm}
+                            setSearchTerm={setSearchTerm}
+                        />
+                        <CategoryTabs
+                            activeTab={activeTab}
+                            setActiveTab={setActiveTab}
+                            ticketsData={ticketsData}
+                            getFilteredTickets={getFilteredTickets}
+                            openTakeModal={openTakeModal}
+                            openViewModal={openViewModal}
+                        />
+                    </>
+                )}
+
+                {/* Modals */}
+                <TicketModals
+                    // Take Modal
+                    showTakeModal={showTakeModal}
+                    setShowTakeModal={setShowTakeModal}
+                    selectedTicket={selectedTicket}
+                    onTakeTicket={onTakeTicket}
+                    // View Modal
+                    showViewModal={showViewModal}
+                    setShowViewModal={setShowViewModal}
+                    // Close Modal
+                    showCloseModal={showCloseModal}
+                    setShowCloseModal={setShowCloseModal}
+                    closeForm={closeForm}
+                    setCloseForm={setCloseForm}
+                    onCloseTicket={onCloseTicket}
+                    // Release Modal
+                    showReleaseModal={showReleaseModal}
+                    setShowReleaseModal={setShowReleaseModal}
+                    onReleaseTicket={onReleaseTicket}
+                    // Edit Modal
+                    showEditModal={showEditModal}
+                    setShowEditModal={setShowEditModal}
+                    editForm={editForm}
+                    setEditForm={setEditForm}
+                    focusedTicket={focusedTicket}
+                    setFocusedTicket={setFocusedTicket}
+                    // Delete Modal
+                    showDeleteModal={showDeleteModal}
+                    setShowDeleteModal={setShowDeleteModal}
+                    // Derive Modal
+                    showDeriveModal={showDeriveModal}
+                    setShowDeriveModal={setShowDeriveModal}
+                    deriveForm={deriveForm}
+                    setDeriveForm={setDeriveForm}
+                    onDeriveTicket={onDeriveTicket}
+                    areas={areas}
                 />
-            ) : hasActiveTicket && !focusedTicket ? (
-                <ActiveTicketMessage />
-            ) : (
-                <>
-                    <Searcher
-                        searchTerm={searchTerm}
-                        setSearchTerm={setSearchTerm}
-                    />
-                    <CategoryTabs
-                        activeTab={activeTab}
-                        setActiveTab={setActiveTab}
-                        ticketsData={ticketsData}
-                        getFilteredTickets={getFilteredTickets}
-                        openTakeModal={openTakeModal}
-                        openViewModal={openViewModal}
-                    />
-                </>
-            )}
-
-            {/* Modals */}
-            <TicketModals 
-                // Take Modal
-                showTakeModal={showTakeModal}
-                setShowTakeModal={setShowTakeModal}
-                selectedTicket={selectedTicket}
-                onTakeTicket={onTakeTicket}
-                
-                // View Modal
-                showViewModal={showViewModal}
-                setShowViewModal={setShowViewModal}
-                
-                // Close Modal
-                showCloseModal={showCloseModal}
-                setShowCloseModal={setShowCloseModal}
-                closeForm={closeForm}
-                setCloseForm={setCloseForm}
-                onCloseTicket={onCloseTicket}
-                
-                // Release Modal
-                showReleaseModal={showReleaseModal}
-                setShowReleaseModal={setShowReleaseModal}
-                onReleaseTicket={onReleaseTicket}
-                
-                // Edit Modal
-                showEditModal={showEditModal}
-                setShowEditModal={setShowEditModal}
-                editForm={editForm}
-                setEditForm={setEditForm}
-                focusedTicket={focusedTicket}
-                setFocusedTicket={setFocusedTicket}
-                
-                // Delete Modal
-                showDeleteModal={showDeleteModal}
-                setShowDeleteModal={setShowDeleteModal}
-                
-                // Derive Modal
-                showDeriveModal={showDeriveModal}
-                setShowDeriveModal={setShowDeriveModal}
-                deriveForm={deriveForm}
-                setDeriveForm={setDeriveForm}
-                onDeriveTicket={onDeriveTicket}
-                areas={areas}
-            />
+            </div>
         </div>
     );
 }

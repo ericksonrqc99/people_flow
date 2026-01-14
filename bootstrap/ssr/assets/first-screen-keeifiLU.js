@@ -1,6 +1,6 @@
 import { jsxs, jsx } from "react/jsx-runtime";
 import axios from "axios";
-import { a as capitalizeFirstLetter } from "./utils-BMo_LHkK.js";
+import { c as capitalizeFirstLetter } from "./utils-CPq9aNLN.js";
 import { useState } from "react";
 import "clsx";
 import "tailwind-merge";

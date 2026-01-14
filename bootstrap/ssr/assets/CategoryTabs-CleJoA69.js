@@ -1,11 +1,11 @@
 import { jsxs, jsx } from "react/jsx-runtime";
-import { B as Badge } from "./badge-44jshGyU.js";
-import { B as Button } from "./button-BmnVj2kL.js";
-import { C as Card, a as CardContent } from "./card-Cm8ppzCC.js";
-import { Eye, UserCheck, Circle, XCircle, CheckCircle, Clock } from "lucide-react";
+import { B as Badge } from "./badge-eMoabTnV.js";
+import { B as Button } from "./button-DYBWqrh5.js";
+import { C as Card, a as CardContent } from "./card-o23MGwpj.js";
+import { ArrowRightLeft, Eye, UserCheck, Circle, XCircle, CheckCircle, Clock } from "lucide-react";
 import "@radix-ui/react-slot";
 import "class-variance-authority";
-import "./utils-BMo_LHkK.js";
+import "./utils-CPq9aNLN.js";
 import "clsx";
 import "tailwind-merge";
 function CategoryTabs({
@@ -29,6 +29,9 @@ function CategoryTabs({
       default:
         return status;
     }
+  };
+  const isTicketDerived = (ticket) => {
+    return ticket.observations && ticket.observations.includes("[Derivado desde área:");
   };
   const getStatusBadgeVariant = (status) => {
     switch (status) {
@@ -114,12 +117,12 @@ function CategoryTabs({
         {
           className: `hover:shadow-xl transition-all duration-300 hover:-translate-y-2 ${getCardStyling(((_a = ticket.status) == null ? void 0 : _a.type) || "")} backdrop-blur-sm`,
           children: /* @__PURE__ */ jsxs(CardContent, { className: "p-5 space-y-4", children: [
-            /* @__PURE__ */ jsxs("div", { className: "flex justify-between items-start", children: [
-              /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
-                /* @__PURE__ */ jsxs("div", { className: "flex items-center space-x-2", children: [
-                  getStatusIcon(((_b = ticket.status) == null ? void 0 : _b.type) || ""),
-                  /* @__PURE__ */ jsx("p", { className: "text-lg font-bold text-green-700", children: ticket.visible_code })
-                ] }),
+            /* @__PURE__ */ jsx("div", { className: "flex justify-between items-start", children: /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
+              /* @__PURE__ */ jsxs("div", { className: "flex items-center space-x-2", children: [
+                getStatusIcon(((_b = ticket.status) == null ? void 0 : _b.type) || ""),
+                /* @__PURE__ */ jsx("p", { className: "text-lg font-bold text-green-700", children: ticket.visible_code })
+              ] }),
+              /* @__PURE__ */ jsxs("div", { className: "flex items-center gap-2 flex-wrap", children: [
                 /* @__PURE__ */ jsx(
                   Badge,
                   {
@@ -127,13 +130,20 @@ function CategoryTabs({
                     className: "text-xs font-semibold",
                     children: getStatusText(((_d = ticket.status) == null ? void 0 : _d.type) || "")
                   }
+                ),
+                isTicketDerived(ticket) && /* @__PURE__ */ jsxs(
+                  Badge,
+                  {
+                    variant: "outline",
+                    className: "text-xs font-medium bg-blue-50 text-blue-700 border-blue-200",
+                    children: [
+                      /* @__PURE__ */ jsx(ArrowRightLeft, { className: "w-3 h-3 mr-1" }),
+                      "Derivado"
+                    ]
+                  }
                 )
-              ] }),
-              /* @__PURE__ */ jsx("div", { className: "text-xs text-gray-500 bg-white/70 px-2 py-1 rounded-full shadow-sm", children: new Date(ticket.created_at).toLocaleDateString("es-ES", {
-                day: "2-digit",
-                month: "2-digit"
-              }) })
-            ] }),
+              ] })
+            ] }) }),
             /* @__PURE__ */ jsxs("div", { className: "space-y-2", children: [
               /* @__PURE__ */ jsxs("div", { children: [
                 /* @__PURE__ */ jsx("p", { className: "text-sm font-medium text-gray-900", children: [

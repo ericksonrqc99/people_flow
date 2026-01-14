@@ -1,29 +1,29 @@
 import { jsxs, jsx, Fragment } from "react/jsx-runtime";
 import { useState, useRef, useEffect } from "react";
-import { u as useTicketEcho, a as useTicketActions } from "./useTicketActions-BIIM3HGa.js";
-import TicketPageHeader from "./TicketPageHeader-DI2LChoi.js";
-import ActiveTicketBanner from "./ActiveTicketBanner-VTq1EO4u.js";
-import TicketFocusedView from "./TicketFocusedView-o0OeJw_X.js";
-import ActiveTicketMessage from "./ActiveTicketMessage-h-PcXQqy.js";
-import Searcher from "./searcher-v9xdTPPM.js";
-import CategoryTabs from "./CategoryTabs-EsPFOV0i.js";
-import TicketModals from "./TicketModals-CjhEkLQ2.js";
-import "@laravel/echo-react";
-import "axios";
-import "../ssr.js";
+import axios from "axios";
+import { T } from "../ssr.js";
+import { T as TicketSchema, u as useTicketEcho, a as useTicketActions } from "./useTicketActions-CWUErzJz.js";
+import TicketPageHeader from "./TicketPageHeader-D8Dg8EUm.js";
+import ActiveTicketBanner from "./ActiveTicketBanner-3OdNfL6J.js";
+import TicketFocusedView from "./TicketFocusedView-LZzDuA2r.js";
+import ActiveTicketMessage from "./ActiveTicketMessage-DJ2zU4rD.js";
+import Searcher from "./searcher-B_B68Vae.js";
+import CategoryTabs from "./CategoryTabs-CleJoA69.js";
+import TicketModals from "./TicketModals-BynnO-P7.js";
 import "@inertiajs/react";
 import "@inertiajs/react/server";
 import "react-dom/server";
 import "zod";
-import "./card-Cm8ppzCC.js";
-import "./utils-BMo_LHkK.js";
+import "./card-o23MGwpj.js";
+import "./utils-CPq9aNLN.js";
 import "clsx";
 import "tailwind-merge";
-import "./badge-44jshGyU.js";
+import "./badge-eMoabTnV.js";
 import "@radix-ui/react-slot";
 import "class-variance-authority";
-import "./button-BmnVj2kL.js";
+import "./button-DYBWqrh5.js";
 import "lucide-react";
+import "@radix-ui/react-dropdown-menu";
 import "@radix-ui/react-dialog";
 import "@radix-ui/react-label";
 function TicketsPage({ ...props }) {
@@ -33,23 +33,29 @@ function TicketsPage({ ...props }) {
     tickets,
     ticketTypes,
     userHasActiveTicket = false,
-    activeTicket = null
+    activeTicket = null,
+    areas = []
   } = props;
-  const [ticketsData, setTicketsData] = useState(tickets);
+  const [ticketsData, setTicketsData] = useState(() => {
+    return tickets.map((ticket) => TicketSchema.parse(ticket));
+  });
   const [hasActiveTicket, setHasActiveTicket] = useState(userHasActiveTicket);
-  const [currentActiveTicket, setCurrentActiveTicket] = useState(activeTicket);
+  const [currentActiveTicket, setCurrentActiveTicket] = useState(() => {
+    return activeTicket ? TicketSchema.parse(activeTicket) : null;
+  });
   const [focusedTicket, setFocusedTicket] = useState(null);
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeTab, setActiveTab] = useState("todos");
+  const [activeTab, setActiveTab] = useState("en espera");
   const [showTakeModal, setShowTakeModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showCloseModal, setShowCloseModal] = useState(false);
   const [showReleaseModal, setShowReleaseModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showDeriveModal, setShowDeriveModal] = useState(false);
   const [closeForm, setCloseForm] = useState({
-    estado: "",
+    estado: "cerrado",
     comentario: ""
   });
   const [editForm, setEditForm] = useState({
@@ -59,6 +65,10 @@ function TicketsPage({ ...props }) {
     estado: "",
     fecha: "",
     comentario: ""
+  });
+  const [deriveForm, setDeriveForm] = useState({
+    toAreaId: "",
+    reason: ""
   });
   const notificationSound = useRef(null);
   const { handleTakeTicket, handleCloseTicket, handleReleaseTicket } = useTicketActions({
@@ -70,7 +80,9 @@ function TicketsPage({ ...props }) {
     setCurrentActiveTicket
   });
   const handleTicketCreated = (e) => {
-    setTicketsData((prevTickets) => [e.ticket, ...prevTickets]);
+    console.log("llego handleTicketCreated");
+    const normalizedTicket = TicketSchema.parse(e.ticket);
+    setTicketsData((prevTickets) => [normalizedTicket, ...prevTickets]);
     if (notificationSound.current) {
       notificationSound.current.play().catch((error) => {
         console.error("No se pudo reproducir el sonido:", error);
@@ -78,16 +90,29 @@ function TicketsPage({ ...props }) {
     }
   };
   const handleTicketUpdated = (e) => {
+    const normalizedTicket = TicketSchema.parse(e.ticket);
     setTicketsData(
       (prevTickets) => prevTickets.map((prevTicket) => {
-        return prevTicket.id === e.ticket.id ? e.ticket : prevTicket;
+        return prevTicket.id === normalizedTicket.id ? normalizedTicket : prevTicket;
       })
     );
+  };
+  const handleTicketDerived = (e) => {
+    const normalizedTicket = TicketSchema.parse(e.ticket);
+    setTicketsData((prevTickets) => [normalizedTicket, ...prevTickets]);
+    if (notificationSound.current) {
+      notificationSound.current.play().catch(console.error);
+    }
+    console.log("Ticket derivado recibido:", {
+      ticket: normalizedTicket,
+      fromAreaId: e.fromAreaId,
+      reason: e.reason
+    });
   };
   const {
     listen: listenToTicketChannels,
     stopListening: stopListeningToTicketChannels
-  } = useTicketEcho(user.area.id, handleTicketCreated, handleTicketUpdated);
+  } = useTicketEcho(user.area.id, handleTicketCreated, handleTicketUpdated, handleTicketDerived);
   useEffect(() => {
     listenToTicketChannels();
     return () => {
@@ -102,7 +127,13 @@ function TicketsPage({ ...props }) {
   const getFilteredTickets = () => {
     return ticketsData.filter((ticket) => {
       var _a2, _b, _c, _d, _e, _f;
-      const matchesSearch = ((_b = (_a2 = ticket.citizen) == null ? void 0 : _a2.names) == null ? void 0 : _b.toLowerCase().includes(searchTerm.toLowerCase())) || ((_d = (_c = ticket.citizen) == null ? void 0 : _c.document_number) == null ? void 0 : _d.includes(searchTerm)) || ((_e = ticket.visible_code) == null ? void 0 : _e.toLowerCase().includes(searchTerm.toLowerCase()));
+      const fullName = [
+        (_a2 = ticket.citizen) == null ? void 0 : _a2.names,
+        (_b = ticket.citizen) == null ? void 0 : _b.first_surname,
+        (_c = ticket.citizen) == null ? void 0 : _c.second_surname
+      ].filter(Boolean).join(" ").toLowerCase();
+      const searchLower = searchTerm.toLowerCase();
+      const matchesSearch = fullName.includes(searchLower) || String(((_d = ticket.citizen) == null ? void 0 : _d.document_number) || "").includes(searchTerm) || ((_e = ticket.visible_code) == null ? void 0 : _e.toLowerCase().includes(searchLower));
       let matchesEstado = true;
       if (activeTab !== "todos") {
         matchesEstado = ((_f = ticket.status) == null ? void 0 : _f.type) === activeTab;
@@ -132,7 +163,7 @@ function TicketsPage({ ...props }) {
       const result = await handleCloseTicket(focusedTicket, closeForm);
       if (result == null ? void 0 : result.success) {
         setShowCloseModal(false);
-        setCloseForm({ estado: "", comentario: "" });
+        setCloseForm({ estado: "cerrado", comentario: "" });
       }
     }
   };
@@ -141,6 +172,34 @@ function TicketsPage({ ...props }) {
       const result = await handleReleaseTicket(focusedTicket, currentActiveTicket);
       if (result == null ? void 0 : result.success) {
         setShowReleaseModal(false);
+      }
+    }
+  };
+  const onDeriveTicket = async () => {
+    if (focusedTicket && deriveForm.toAreaId && deriveForm.reason.trim()) {
+      try {
+        const response = await axios.post(T("tickets.derive"), {
+          ticket_id: focusedTicket.id,
+          to_area_id: parseInt(deriveForm.toAreaId),
+          reason: deriveForm.reason
+        });
+        const result = response.data;
+        if (result.ok) {
+          setShowDeriveModal(false);
+          setDeriveForm({ toAreaId: "", reason: "" });
+          setTicketsData(
+            (prevTickets) => prevTickets.filter((ticket) => ticket.id !== focusedTicket.id)
+          );
+          setFocusedTicket(null);
+          setHasActiveTicket(false);
+          setCurrentActiveTicket(null);
+          console.log("Ticket derivado exitosamente");
+        } else {
+          alert(result.message || "Error al derivar el ticket");
+        }
+      } catch (error) {
+        console.error("Error derivando ticket:", error);
+        alert("Error al derivar el ticket. Por favor intente nuevamente.");
       }
     }
   };
@@ -167,7 +226,7 @@ function TicketsPage({ ...props }) {
         areaName: (_a = user.area) == null ? void 0 : _a.name
       }
     ),
-    hasActiveTicket && currentActiveTicket && /* @__PURE__ */ jsx(
+    hasActiveTicket && currentActiveTicket && !focusedTicket && /* @__PURE__ */ jsx(
       ActiveTicketBanner,
       {
         currentActiveTicket,
@@ -178,10 +237,9 @@ function TicketsPage({ ...props }) {
       TicketFocusedView,
       {
         ticket: focusedTicket,
-        onBack: () => setFocusedTicket(null),
-        onEdit: () => setShowEditModal(true),
         onClose: () => setShowCloseModal(true),
-        onRelease: () => setShowReleaseModal(true)
+        onRelease: () => setShowReleaseModal(true),
+        onDerive: () => setShowDeriveModal(true)
       }
     ) : hasActiveTicket && !focusedTicket ? /* @__PURE__ */ jsx(ActiveTicketMessage, {}) : /* @__PURE__ */ jsxs(Fragment, { children: [
       /* @__PURE__ */ jsx(
@@ -227,7 +285,13 @@ function TicketsPage({ ...props }) {
         focusedTicket,
         setFocusedTicket,
         showDeleteModal,
-        setShowDeleteModal
+        setShowDeleteModal,
+        showDeriveModal,
+        setShowDeriveModal,
+        deriveForm,
+        setDeriveForm,
+        onDeriveTicket,
+        areas
       }
     )
   ] });

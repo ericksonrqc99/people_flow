@@ -212,7 +212,8 @@ return [
         'custom_permissions' => [
             //'view-log'
             'Ver Panel De Tickets',
-            'Ver Panel De Generacion De Tickets'
+            'Ver Modulo de Tickets',
+            "Ver Modulo de GAT"
         ],
 
         'user_model' => \App\Models\User::class,

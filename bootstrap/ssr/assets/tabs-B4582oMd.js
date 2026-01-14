@@ -1,6 +1,6 @@
 import { jsx } from "react/jsx-runtime";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
-import { b as cn } from "./utils-BMo_LHkK.js";
+import { a as cn } from "./utils-CPq9aNLN.js";
 function Tabs({
   className,
   ...props
