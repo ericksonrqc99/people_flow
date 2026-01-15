@@ -203,11 +203,16 @@ class CitizenResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('document_number')
                     ->label(__('DNI'))
+                    ->badge()
+                    ->color('gray')
+                    ->icon('heroicon-m-identification')
                     ->searchable()
                     ->sortable()
                     ->weight('bold'),
                 Tables\Columns\TextColumn::make('names')
                     ->label(__('Nombres'))
+                    ->icon('heroicon-m-user')
+                    ->iconColor('gray')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('first_surname')
@@ -229,6 +234,7 @@ class CitizenResource extends Resource
                         0 => 'inactivo',
                         1 => 'activo'
                     })
+                    ->icon(fn(int $state): string => $state ? 'heroicon-m-check-circle' : 'heroicon-m-x-circle')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('Creado'))

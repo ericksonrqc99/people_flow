@@ -23,6 +23,8 @@ class ActivityLogResource extends Resource
 
     protected static ?int $navigationSort = 50;
 
+    protected static ?string $navigationGroup = 'Sistema';
+
     protected static function isSuperAdmin(): bool
     {
         $user = auth()->user();

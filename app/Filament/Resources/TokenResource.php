@@ -22,6 +22,8 @@ class TokenResource extends Resource
 
     protected static ?string $navigationLabel = 'Tokens';
 
+    protected static ?string $navigationGroup = 'Sistema';
+
     protected static ?string $modelLabel = 'Token';
 
     protected static ?string $pluralModelLabel = 'Tokens';
@@ -73,14 +75,23 @@ class TokenResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->label(__('ID'))
+                    ->badge()
+                    ->color('gray')
+                    ->icon('heroicon-m-hashtag')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('service')
                     ->label(__('Servicio'))
+                    ->badge()
+                    ->color('info')
+                    ->icon('heroicon-m-cog-6-tooth')
                     ->searchable()
                     ->sortable()
                     ->weight('bold'),
                 Tables\Columns\TextColumn::make('access_token')
                     ->label(__('Token'))
+                    ->badge()
+                    ->color('primary')
+                    ->icon('heroicon-m-key')
                     ->limit(40)
                     ->searchable()
                     ->copyable()
@@ -96,6 +107,7 @@ class TokenResource extends Resource
                         0 => 'inactivo',
                         1 => 'activo'
                     })
+                    ->icon(fn(int $state): string => $state ? 'heroicon-m-check-circle' : 'heroicon-m-x-circle')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('Creado'))

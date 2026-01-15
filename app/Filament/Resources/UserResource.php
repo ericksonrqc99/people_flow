@@ -125,11 +125,16 @@ class UserResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('Nombre'))
+                    ->icon('heroicon-m-user-circle')
+                    ->iconColor('gray')
                     ->searchable()
                     ->sortable()
                     ->weight('bold'),
                 Tables\Columns\TextColumn::make('email')
                     ->label(__('Correo'))
+                    ->badge()
+                    ->color('gray')
+                    ->icon('heroicon-m-envelope')
                     ->searchable()
                     ->sortable()
                     ->copyable(),
@@ -137,12 +142,14 @@ class UserResource extends Resource
                     ->label(__('Área'))
                     ->badge()
                     ->color('primary')
+                    ->icon('heroicon-m-building-office-2')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('roles.name')
                     ->label(__('Roles'))
                     ->badge()
                     ->color('secondary')
+                    ->icon('heroicon-m-shield-check')
                     ->separator(', ')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -157,6 +164,7 @@ class UserResource extends Resource
                         0 => 'inactivo',
                         1 => 'activo'
                     })
+                    ->icon(fn(int $state): string => $state ? 'heroicon-m-check-circle' : 'heroicon-m-x-circle')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('Creado'))

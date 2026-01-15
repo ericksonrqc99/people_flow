@@ -174,12 +174,21 @@ class TicketResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('code')
                     ->label('Código Interno')
+                    ->badge()
+                    ->color('gray')
+                    ->icon('heroicon-m-hashtag')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('visible_code')
                     ->label('Código Visible')
+                    ->badge()
+                    ->color('primary')
+                    ->icon('heroicon-m-ticket')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('area.name')
-                    ->numeric()
+                    ->label('Área')
+                    ->badge()
+                    ->color('info')
+                    ->icon('heroicon-m-building-office-2')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('citizen.full_name')
                     ->label('Ciudadano')
@@ -199,14 +208,20 @@ class TicketResource extends Resource
                         return "Documento: " . ($citizen->document_number ?? 'N/A') . "\n" .
                             "Teléfono: " . ($citizen->phone ?? 'N/A') . "\n" .
                             "Email: " . ($citizen->email ?? 'N/A');
-                    }),
+                    })
+                    ->icon('heroicon-m-user-circle')
+                    ->iconColor('gray'),
                 Tables\Columns\TextColumn::make('registeredBy.name')
                     ->label(__('Registrado por'))
-                    ->numeric()
+                    ->badge()
+                    ->color('gray')
+                    ->icon('heroicon-m-user-plus')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('attendedBy.name')
                     ->label(__('Atendido por'))
-                    ->numeric()
+                    ->badge()
+                    ->color('success')
+                    ->icon('heroicon-m-user')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status.type')
                     ->label('Estado')

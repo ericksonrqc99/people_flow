@@ -10,8 +10,8 @@
             flex-direction: column;
         }
 
-        .fi-wi-chart > .fi-section,
-        .fi-wi-chart > .fi-card {
+        .fi-wi-chart>.fi-section,
+        .fi-wi-chart>.fi-card {
             flex: 1 1 auto;
             display: flex;
             flex-direction: column;
@@ -22,26 +22,25 @@
         }
     </style>
     @if (! ($isSuperAdmin ?? false))
-        <div class="flex justify-center py-10">
-            <a
-                href="{{ $homeUrl ?? url('/') }}"
-                class="inline-flex items-center rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-primary-500"
-            >
-                Ir a inicio
-            </a>
-        </div>
+    <div class="flex justify-center py-10 flex-col items-center text-center gap-6">
+        <h1>AREA RESTRINGIDA PARA ADMINISTRADORES</h1>
+        <a
+            href="{{ $homeUrl ?? url('/') }}"
+            class="w-1/2 inline-flex items-center rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-primary-500">
+            Ir a inicio
+        </a>
+    </div>
     @else
-        @if (method_exists($this, 'filtersForm'))
-            {{ $this->filtersForm }}
-        @endif
+    @if (method_exists($this, 'filtersForm'))
+    {{ $this->filtersForm }}
+    @endif
 
-        <x-filament-widgets::widgets
-            :columns="$this->getColumns()"
-            :data="[
+    <x-filament-widgets::widgets
+        :columns="$this->getColumns()"
+        :data="[
                 ...(property_exists($this, 'filters') ? ['filters' => $this->filters] : []),
                 ...$this->getWidgetData(),
             ]"
-            :widgets="$this->getVisibleWidgets()"
-        />
+        :widgets="$this->getVisibleWidgets()" />
     @endif
 </x-filament-panels::page>

@@ -112,14 +112,14 @@ export default function AreasScreen({
     };
 
     const selectSubgerencia = (subgerencia: AreaT) => {
-        const parentGerencia = !selectedAreas.gerencia.id
-            ? areas.find((a) => a.id === subgerencia.parent_id)
-            : null;
+        const parentGerencia = areas.find((a) => a.id === subgerencia.parent_id) ?? null;
 
         setSelectedAreas({
             ...selectedAreas,
             gerencia: parentGerencia ?? selectedAreas.gerencia,
             subgerencia,
+            unidad: initArea,
+            oficina: initArea,
         });
     };
 

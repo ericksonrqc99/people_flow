@@ -106,11 +106,16 @@ class AreaResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('code')
                     ->label(__('Código'))
+                    ->badge()
+                    ->color('gray')
+                    ->icon('heroicon-m-hashtag')
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('Nombre'))
+                    ->icon('heroicon-m-building-office-2')
+                    ->iconColor('info')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('type.type')
@@ -120,6 +125,8 @@ class AreaResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('description')
                     ->label(__('Descripción'))
+                    ->icon('heroicon-m-document-text')
+                    ->iconColor('gray')
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
@@ -128,6 +135,7 @@ class AreaResource extends Resource
                     ->label(__('Área Padre'))
                     ->badge()
                     ->color('secondary')
+                    ->icon('heroicon-m-arrow-up-right')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('is_active')
