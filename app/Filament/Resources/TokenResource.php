@@ -18,7 +18,13 @@ class TokenResource extends Resource
 {
     protected static ?string $model = Token::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-key';
+
+    protected static ?string $navigationLabel = 'Tokens';
+
+    protected static ?string $modelLabel = 'Token';
+
+    protected static ?string $pluralModelLabel = 'Tokens';
 
     public static function form(Form $form): Form
     {
@@ -63,6 +69,7 @@ class TokenResource extends Resource
         return $table
             ->paginationPageOptions([5, 20, 50, 100])
             ->deferLoading()
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->label(__('ID'))

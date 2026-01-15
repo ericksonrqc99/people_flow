@@ -68,6 +68,52 @@ interface TicketModalsProps {
     setShowDeleteModal: (show: boolean) => void;
 }
 
+// Modal Header Component - AdminLTE Style
+const ModalHeader = ({ title, description }: { title: string; description?: string }) => (
+    <div className="bg-gray-700 text-white px-4 py-3">
+        <h2 className="text-sm font-bold text-white">{title}</h2>
+        {description && <p className="text-sm text-gray-300 mt-1">{description}</p>}
+    </div>
+);
+
+// Modal Footer Component - AdminLTE Style
+const ModalFooter = ({ children }: { children: React.ReactNode }) => (
+    <div className="flex gap-2 justify-end px-4 py-3 border-t border-gray-300">
+        {children}
+    </div>
+);
+
+// Modal Button Component
+const ModalButton = ({ 
+    onClick, 
+    variant = 'primary', 
+    disabled = false,
+    children 
+}: { 
+    onClick?: () => void; 
+    variant?: 'primary' | 'secondary' | 'danger' | 'success'; 
+    disabled?: boolean;
+    children: React.ReactNode;
+}) => {
+    const baseStyle = 'px-3 py-2 text-sm font-semibold transition-colors';
+    const variants = {
+        primary: 'bg-blue-700 text-white border border-blue-800 hover:bg-blue-800 disabled:bg-gray-400 disabled:border-gray-500',
+        secondary: 'bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200',
+        danger: 'bg-red-700 text-white border border-red-800 hover:bg-red-800',
+        success: 'bg-green-700 text-white border border-green-800 hover:bg-green-800'
+    };
+    
+    return (
+        <button 
+            onClick={onClick}
+            disabled={disabled}
+            className={`${baseStyle} ${variants[variant]} ${disabled ? 'cursor-not-allowed' : ''}`}
+        >
+            {children}
+        </button>
+    );
+};
+
 export default function TicketModals({
     // Take Modal
     showTakeModal,
@@ -116,113 +162,103 @@ export default function TicketModals({
         <>
             {/* Take Ticket Modal */}
             <Dialog open={showTakeModal} onOpenChange={setShowTakeModal}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Confirmar acción</DialogTitle>
-                        <DialogDescription>
-                            ¿Estás seguro de que quieres tomar este ticket?
-                        </DialogDescription>
-                    </DialogHeader>
-                    {selectedTicket && (
-                        <div className="space-y-2">
-                            <p><strong>Código:</strong> {selectedTicket.visible_code}</p>
-                            <p><strong>Ciudadano:</strong> {[
-                                selectedTicket.citizen?.names,
-                                selectedTicket.citizen?.first_surname,
-                                selectedTicket.citizen?.second_surname
-                            ].filter(Boolean).join(' ')}</p>
-                            <p><strong>DNI:</strong> {selectedTicket.citizen?.document_number}</p>
-                        </div>
-                    )}
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setShowTakeModal(false)}>
+                <DialogContent className="border border-gray-300 rounded-none shadow-none p-0">
+                    <ModalHeader title="Confirmar acción" description="¿Estás seguro de que quieres tomar este ticket?" />
+                    <div className="px-4 py-3">
+                        {selectedTicket && (
+                            <div className="space-y-2 text-sm">
+                                <p><strong>Código:</strong> {selectedTicket.visible_code}</p>
+                                <p><strong>Ciudadano:</strong> {[
+                                    selectedTicket.citizen?.names,
+                                    selectedTicket.citizen?.first_surname,
+                                    selectedTicket.citizen?.second_surname
+                                ].filter(Boolean).join(' ')}</p>
+                                <p><strong>DNI:</strong> {selectedTicket.citizen?.document_number}</p>
+                            </div>
+                        )}
+                    </div>
+                    <ModalFooter>
+                        <ModalButton variant="secondary" onClick={() => setShowTakeModal(false)}>
                             Cancelar
-                        </Button>
-                        <Button onClick={onTakeTicket}>
+                        </ModalButton>
+                        <ModalButton variant="primary" onClick={onTakeTicket}>
                             Confirmar
-                        </Button>
-                    </DialogFooter>
+                        </ModalButton>
+                    </ModalFooter>
                 </DialogContent>
             </Dialog>
 
             {/* View Ticket Modal */}
             <Dialog open={showViewModal} onOpenChange={setShowViewModal}>
-                <DialogContent className="max-w-2xl">
-                    <DialogHeader>
-                        <DialogTitle>Detalles del Ticket</DialogTitle>
-                    </DialogHeader>
-                    {selectedTicket && (
-                        <div className="space-y-4">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <Label>Código</Label>
-                                    <p className="text-sm">{selectedTicket.visible_code}</p>
-                                </div>
-                                <div>
-                                    <Label>Estado</Label>
-                                    <p className="text-sm">{selectedTicket.status?.type}</p>
-                                </div>
-                                <div>
-                                    <Label>Ciudadano</Label>
-                                    <p className="text-sm">
-                                        {[
-                                            selectedTicket.citizen?.names,
-                                            selectedTicket.citizen?.first_surname,
-                                            selectedTicket.citizen?.second_surname
-                                        ].filter(Boolean).join(' ')}
-                                    </p>
-                                </div>
-                                <div>
-                                    <Label>DNI</Label>
-                                    <p className="text-sm">{selectedTicket.citizen?.document_number}</p>
-                                </div>
-                                <div>
-                                    <Label>Área</Label>
-                                    <p className="text-sm">{selectedTicket.area?.name}</p>
-                                </div>
-                                <div>
-                                    <Label>Fecha de creación</Label>
-                                    <p className="text-sm">
-                                        {new Date(selectedTicket.created_at).toLocaleString()}
-                                    </p>
-                                </div>
-                            </div>
-                            {selectedTicket.observations && (
-                                <div className="mt-6 p-4 bg-gray-50 rounded-lg border">
-                                    <Label className="text-base font-semibold text-gray-900 mb-3 block">
-                                        Observaciones
-                                    </Label>
-                                    <div className="bg-white p-4 rounded-md border border-gray-200 min-h-[80px] max-h-[200px] overflow-y-auto">
-                                        <p className="text-sm leading-relaxed text-gray-700 whitespace-pre-wrap break-words">
-                                            {selectedTicket.observations}
+                <DialogContent className="max-w-2xl border border-gray-300 rounded-none shadow-none p-0">
+                    <ModalHeader title="Detalles del Ticket" />
+                    <div className="px-4 py-3">
+                        {selectedTicket && (
+                            <div className="space-y-3">
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-700 mb-1">Código</p>
+                                        <p className="text-sm text-gray-900">{selectedTicket.visible_code}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-700 mb-1">Estado</p>
+                                        <p className="text-sm text-gray-900">{selectedTicket.status?.type}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-700 mb-1">Ciudadano</p>
+                                        <p className="text-sm text-gray-900">
+                                            {[
+                                                selectedTicket.citizen?.names,
+                                                selectedTicket.citizen?.first_surname,
+                                                selectedTicket.citizen?.second_surname
+                                            ].filter(Boolean).join(' ')}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-700 mb-1">DNI</p>
+                                        <p className="text-sm text-gray-900">{selectedTicket.citizen?.document_number}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-700 mb-1">Área</p>
+                                        <p className="text-sm text-gray-900">{selectedTicket.area?.name}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-700 mb-1">Fecha de creación</p>
+                                        <p className="text-sm text-gray-900">
+                                            {new Date(selectedTicket.created_at).toLocaleString()}
                                         </p>
                                     </div>
                                 </div>
-                            )}
-                        </div>
-                    )}
-                    <DialogFooter>
-                        <Button onClick={() => setShowViewModal(false)}>
+                                {selectedTicket.observations && (
+                                    <div className="mt-2 p-2 bg-gray-50 border border-gray-300">
+                                        <p className="text-sm font-semibold text-gray-900 mb-1">
+                                            Observaciones
+                                        </p>
+                                        <div className="bg-white p-2 border border-gray-300 min-h-[60px] max-h-[150px] overflow-y-auto text-sm text-gray-700 whitespace-pre-wrap break-words">
+                                            {selectedTicket.observations}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                    <ModalFooter>
+                        <ModalButton variant="primary" onClick={() => setShowViewModal(false)}>
                             Cerrar
-                        </Button>
-                    </DialogFooter>
+                        </ModalButton>
+                    </ModalFooter>
                 </DialogContent>
             </Dialog>
 
             {/* Close Ticket Modal */}
             <Dialog open={showCloseModal} onOpenChange={setShowCloseModal}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Cerrar Ticket</DialogTitle>
-                        <DialogDescription>
-                            Selecciona el estado final del ticket y añade observaciones.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-4">
+                <DialogContent className="border border-gray-300 rounded-none shadow-none p-0">
+                    <ModalHeader title="Cerrar Ticket" description="Selecciona el estado final del ticket y añade observaciones." />
+                    <div className="px-4 py-3 space-y-3">
                         <div>
-                            <Label>Estado final</Label>
-                            <div className="mt-2 space-y-2">
-                                <div className="flex items-center space-x-2">
+                            <p className="text-sm font-semibold text-gray-700 mb-2">Estado final</p>
+                            <div className="space-y-2">
+                                <div className="flex items-center gap-2">
                                     <input
                                         type="radio"
                                         id="cerrado"
@@ -233,9 +269,9 @@ export default function TicketModals({
                                             setCloseForm({ ...closeForm, estado: e.target.value as 'cerrado' | 'cancelado' })
                                         }
                                     />
-                                    <Label htmlFor="cerrado">Cerrado (Completado)</Label>
+                                    <label htmlFor="cerrado" className="text-sm text-gray-700 cursor-pointer">Cerrado (Completado)</label>
                                 </div>
-                                <div className="flex items-center space-x-2">
+                                <div className="flex items-center gap-2">
                                     <input
                                         type="radio"
                                         id="cancelado"
@@ -246,12 +282,12 @@ export default function TicketModals({
                                             setCloseForm({ ...closeForm, estado: e.target.value as 'cerrado' | 'cancelado' })
                                         }
                                     />
-                                    <Label htmlFor="cancelado">Cancelado</Label>
+                                    <label htmlFor="cancelado" className="text-sm text-gray-700 cursor-pointer">Cancelado</label>
                                 </div>
                             </div>
                         </div>
                         <div>
-                            <Label htmlFor="comentario">Observaciones finales</Label>
+                            <label htmlFor="comentario" className="text-sm font-semibold text-gray-700 block mb-2">Observaciones finales</label>
                             <textarea
                                 id="comentario"
                                 value={closeForm.comentario}
@@ -259,81 +295,64 @@ export default function TicketModals({
                                     setCloseForm({ ...closeForm, comentario: e.target.value })
                                 }
                                 placeholder="Escribe observaciones sobre la atención..."
-                                className="mt-1 w-full min-h-[100px] p-2 border border-gray-300 rounded-md"
+                                className="w-full min-h-[80px] p-2 border border-gray-300 text-sm"
                             />
                         </div>
                     </div>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setShowCloseModal(false)}>
+                    <ModalFooter>
+                        <ModalButton variant="secondary" onClick={() => setShowCloseModal(false)}>
                             Cancelar
-                        </Button>
-                        <Button 
-                            onClick={onCloseTicket}
-                        >
+                        </ModalButton>
+                        <ModalButton variant="success" onClick={onCloseTicket}>
                             Cerrar Ticket
-                        </Button>
-                    </DialogFooter>
+                        </ModalButton>
+                    </ModalFooter>
                 </DialogContent>
             </Dialog>
 
             {/* Release Ticket Modal */}
             <Dialog open={showReleaseModal} onOpenChange={setShowReleaseModal}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Liberar Ticket</DialogTitle>
-                        <DialogDescription>
-                            ¿Estás seguro de que quieres liberar este ticket? Volverá al estado pendiente.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setShowReleaseModal(false)}>
+                <DialogContent className="border border-gray-300 rounded-none shadow-none p-0">
+                    <ModalHeader title="Liberar Ticket" description="¿Estás seguro de que quieres liberar este ticket? Volverá al estado pendiente." />
+                    <ModalFooter>
+                        <ModalButton variant="secondary" onClick={() => setShowReleaseModal(false)}>
                             Cancelar
-                        </Button>
-                        <Button variant="destructive" onClick={onReleaseTicket}>
+                        </ModalButton>
+                        <ModalButton variant="danger" onClick={onReleaseTicket}>
                             Liberar
-                        </Button>
-                    </DialogFooter>
+                        </ModalButton>
+                    </ModalFooter>
                 </DialogContent>
             </Dialog>
 
             {/* Edit Modal - Placeholder */}
             <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Editar Ticket</DialogTitle>
-                        <DialogDescription>
-                            Funcionalidad de edición en desarrollo.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                        <Button onClick={() => setShowEditModal(false)}>
+                <DialogContent className="border border-gray-300 rounded-none shadow-none p-0">
+                    <ModalHeader title="Editar Ticket" description="Funcionalidad de edición en desarrollo." />
+                    <ModalFooter>
+                        <ModalButton variant="primary" onClick={() => setShowEditModal(false)}>
                             Cerrar
-                        </Button>
-                    </DialogFooter>
+                        </ModalButton>
+                    </ModalFooter>
                 </DialogContent>
             </Dialog>
 
             {/* Derive Modal */}
             <Dialog open={showDeriveModal} onOpenChange={setShowDeriveModal}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Derivar Ticket</DialogTitle>
-                        <DialogDescription>
-                            Selecciona el área a la que deseas derivar este ticket y proporciona una razón.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="area" className="text-right">
+                <DialogContent className="border border-gray-300 rounded-none shadow-none p-0">
+                    <ModalHeader title="Derivar Ticket" description="Selecciona el área a la que deseas derivar este ticket y proporciona una razón." />
+                    <div className="px-4 py-3 space-y-3">
+                        <div>
+                            <label htmlFor="area" className="text-sm font-semibold text-gray-700 block mb-2">
                                 Área destino
-                            </Label>
+                            </label>
                             <select
                                 id="area"
                                 value={deriveForm.toAreaId}
                                 onChange={(e: ChangeEvent<HTMLSelectElement>) =>
                                     setDeriveForm({ ...deriveForm, toAreaId: e.target.value })
                                 }
-                                className="col-span-3 px-3 py-2 border border-gray-300 rounded-md"
+                                className="w-full px-3 py-2 border border-gray-300 text-sm"
                             >
                                 <option value="">Selecciona un área</option>
                                 {areas.map((area) => (
@@ -343,62 +362,58 @@ export default function TicketModals({
                                 ))}
                             </select>
                         </div>
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="reason" className="text-right">
+                        <div>
+                            <label htmlFor="reason" className="text-sm font-semibold text-gray-700 block mb-2">
                                 Razón
-                            </Label>
-                            <div className="col-span-3">
+                            </label>
+                            <div>
                                 <textarea
                                     id="reason"
                                     value={deriveForm.reason}
                                     onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
                                         setDeriveForm({ ...deriveForm, reason: e.target.value })
                                     }
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                    className="w-full px-3 py-2 border border-gray-300 text-sm"
                                     rows={3}
                                     placeholder="Explica por qué derivar este ticket..."
                                 />
-                                <p className={`text-xs mt-1 ${
+                                <p className={`text-sm mt-1 ${
                                     deriveForm.reason.trim().length < 10 
-                                        ? 'text-red-500' 
-                                        : 'text-green-600'
+                                        ? 'text-red-600' 
+                                        : 'text-green-700'
                                 }`}>
                                     {deriveForm.reason.trim().length}/10 caracteres mínimos
                                 </p>
                             </div>
                         </div>
                     </div>
-                    <DialogFooter>
-                        <Button 
-                            variant="outline" 
+                    <ModalFooter>
+                        <ModalButton 
+                            variant="secondary" 
                             onClick={() => setShowDeriveModal(false)}
                         >
                             Cancelar
-                        </Button>
-                        <Button 
+                        </ModalButton>
+                        <ModalButton 
+                            variant="primary"
                             onClick={onDeriveTicket}
                             disabled={!deriveForm.toAreaId || !deriveForm.reason.trim() || deriveForm.reason.trim().length < 10}
                         >
-                            Derivar Ticket
-                        </Button>
-                    </DialogFooter>
+                            Derivar
+                        </ModalButton>
+                    </ModalFooter>
                 </DialogContent>
             </Dialog>
 
             {/* Delete Modal - Placeholder */}
             <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Eliminar Ticket</DialogTitle>
-                        <DialogDescription>
-                            Funcionalidad de eliminación en desarrollo.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                        <Button onClick={() => setShowDeleteModal(false)}>
+                <DialogContent className="border border-gray-300 rounded-none shadow-none p-0">
+                    <ModalHeader title="Eliminar Ticket" description="Funcionalidad de eliminación en desarrollo." />
+                    <ModalFooter>
+                        <ModalButton variant="primary" onClick={() => setShowDeleteModal(false)}>
                             Cerrar
-                        </Button>
-                    </DialogFooter>
+                        </ModalButton>
+                    </ModalFooter>
                 </DialogContent>
             </Dialog>
         </>

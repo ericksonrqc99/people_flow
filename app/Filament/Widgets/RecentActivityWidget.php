@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Resources\TicketResource;
 use App\Models\Ticket;
 use App\Models\User;
 use Filament\Tables;
@@ -13,7 +14,7 @@ class RecentActivityWidget extends BaseWidget
 {
     protected static ?string $heading = 'Actividad Reciente de Tickets';
     
-    protected static ?int $sort = 11;
+    protected static ?int $sort = 21;
     
     protected int | string | array $columnSpan = 'full';
 
@@ -24,7 +25,6 @@ class RecentActivityWidget extends BaseWidget
                 Ticket::query()
                     ->with(['citizen', 'area', 'attendedBy', 'status', 'registeredBy'])
                     ->latest()
-                    ->limit(15)
             )
             ->columns([
                 Tables\Columns\TextColumn::make('code')
@@ -190,9 +190,11 @@ class RecentActivityWidget extends BaseWidget
             ->actions([
                 // Removido temporalmente hasta que se cree el TicketResource
             ])
+            ->recordUrl(fn (Ticket $record): string => TicketResource::getUrl('edit', ['record' => $record]))
             ->defaultSort('created_at', 'desc')
             ->striped()
-            ->paginated(false)
+            ->paginated([10, 25, 50])
+            ->paginationPageOptions([10, 25, 50])
             ->searchable()
             ->emptyStateHeading('No hay actividad reciente')
             ->emptyStateDescription('Los tickets aparecerán aquí cuando se creen.')

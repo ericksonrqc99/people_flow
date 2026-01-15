@@ -79,38 +79,34 @@ export default function TicketPageHeader({ userName, areaName }: TicketPageHeade
     if (!isVisible) {
         return (
             <>
-                <div className="flex items-center justify-between bg-white px-6 py-3 rounded-lg border border-gray-200 shadow-sm">
+                <div className="flex items-center justify-between bg-white px-4 py-3 border border-gray-300 shadow">
                     <div className="flex items-center space-x-3">
-                        <div className="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-lg">
-                            <User className="w-4 h-4 text-blue-600" />
+                        <div className="flex items-center justify-center w-8 h-8 bg-blue-700 text-white text-xs font-bold">
+                            {userName.charAt(0).toUpperCase()}
                         </div>
-                        <span className="font-medium text-gray-800">{userName}</span>
+                        <span className="text-xs font-semibold text-gray-800">{userName}</span>
                         {areaName && (
                             <>
                                 <span className="text-gray-300">|</span>
-                                <span className="text-sm text-gray-600">{areaName}</span>
+                                <span className="text-xs text-gray-600">{areaName}</span>
                             </>
                         )}
                     </div>
                     <div className="flex items-center space-x-2">
-                        <Button
-                            variant="ghost"
-                            size="sm"
+                        <button
                             onClick={() => setIsVisible(true)}
-                            className="h-8 px-3 text-blue-600 hover:bg-blue-50"
+                            className="h-7 px-2 text-blue-700 hover:bg-blue-50 text-xs font-semibold transition-colors border border-blue-700"
                         >
-                            <Eye className="w-4 h-4 mr-1" />
-                            <span className="text-xs">Mostrar</span>
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            size="sm"
+                            <Eye className="w-3 h-3 mr-1 inline" />
+                            Mostrar
+                        </button>
+                        <button
                             onClick={handleLogout}
-                            className="h-8 px-3 text-red-600 hover:bg-red-50"
+                            className="h-7 px-2 text-red-700 hover:bg-red-50 text-xs font-semibold transition-colors border border-red-700"
                             title="Cerrar sesión"
                         >
-                            <LogOut className="w-4 h-4" />
-                        </Button>
+                            <LogOut className="w-3 h-3" />
+                        </button>
                     </div>
                 </div>
                 
@@ -127,33 +123,33 @@ export default function TicketPageHeader({ userName, areaName }: TicketPageHeade
     return (
         <>
             {/* AdminLTE Style Header */}
-            <div className="bg-white border-b-2 border-blue-600 shadow-md rounded-lg overflow-hidden">
-                <div className="px-6 py-4">
+            <div className="bg-white border border-gray-300 border-b-4 border-b-blue-600 shadow">
+                <div className="px-4 py-3">
                     <div className="flex items-center justify-between">
                         {/* Left Section */}
-                        <div className="flex items-center space-x-6">
+                        <div className="flex items-center space-x-4">
                             {/* User Info */}
-                            <div className="flex items-center space-x-4">
-                                <div className="flex items-center justify-center w-12 h-12 bg-blue-600 text-white rounded-lg font-bold">
+                            <div className="flex items-center space-x-3">
+                                <div className="flex items-center justify-center w-10 h-10 bg-blue-700 text-white text-xs font-bold">
                                     {userName.charAt(0).toUpperCase()}
                                 </div>
                                 <div>
-                                    <h2 className="text-lg font-bold text-gray-800">
+                                    <h2 className="text-sm font-bold text-gray-800">
                                         {userName}
                                     </h2>
-                                    <p className="text-xs text-gray-500">
-                                        Panel de Gestión de Tickets
+                                    <p className="text-xs text-gray-600">
+                                        Panel de Gestión
                                     </p>
                                 </div>
                             </div>
 
                             {/* Area Badge */}
                             {areaName && (
-                                <div className="flex items-center space-x-2 pl-4 border-l border-gray-300">
-                                    <Building2 className="w-4 h-4 text-blue-600" />
+                                <div className="flex items-center space-x-2 pl-3 border-l border-gray-300">
+                                    <Building2 className="w-4 h-4 text-gray-700" />
                                     <div>
-                                        <p className="text-xs text-gray-600">Área Asignada</p>
-                                        <p className="text-sm font-semibold text-gray-800">
+                                        <p className="text-xs text-gray-600">Área</p>
+                                        <p className="text-xs font-semibold text-gray-800">
                                             {areaName}
                                         </p>
                                     </div>
@@ -162,38 +158,34 @@ export default function TicketPageHeader({ userName, areaName }: TicketPageHeade
                         </div>
 
                         {/* Right Section */}
-                        <div className="flex items-center space-x-6">
+                        <div className="flex items-center space-x-3">
                             {/* Time Info */}
-                            <div className="flex items-center space-x-2 text-right pl-6 border-l border-gray-300">
-                                <Clock className="w-4 h-4 text-gray-600" />
+                            <div className="flex items-center space-x-2 text-right pl-3 border-l border-gray-300">
+                                <Clock className="w-4 h-4 text-gray-700" />
                                 <div>
-                                    <p className="text-xs text-gray-600">Hora Actual</p>
-                                    <p className="text-sm font-semibold text-gray-800">
+                                    <p className="text-xs text-gray-600">Hora</p>
+                                    <p className="text-xs font-semibold text-gray-800">
                                         {currentTime}
                                     </p>
                                 </div>
                             </div>
 
                             {/* Actions */}
-                            <div className="flex items-center space-x-2 pl-6 border-l border-gray-300">
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
+                            <div className="flex items-center space-x-2 pl-3 border-l border-gray-300">
+                                <button
                                     onClick={() => setIsVisible(false)}
-                                    className="h-8 w-8 p-0 text-gray-600 hover:bg-gray-100"
+                                    className="h-7 w-7 p-0 text-gray-600 hover:bg-gray-100 transition-colors text-xs flex items-center justify-center"
                                     title="Ocultar header"
                                 >
                                     <X className="w-4 h-4" />
-                                </Button>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
+                                </button>
+                                <button
                                     onClick={handleLogout}
-                                    className="h-8 px-3 text-red-600 hover:bg-red-50 font-medium"
+                                    className="h-7 px-2 text-red-700 hover:bg-red-50 font-semibold text-xs transition-colors border border-red-700"
                                 >
-                                    <LogOut className="w-4 h-4 mr-2" />
-                                    Salir
-                                </Button>
+                                    <LogOut className="w-3 h-3 mr-1 inline" />
+                                    Cerrar Sesión
+                                </button>
                             </div>
                         </div>
                     </div>

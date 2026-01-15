@@ -12,11 +12,12 @@ class HourlyActivityChart extends ChartWidget
     
     protected static ?int $sort = 7;
     
-    protected int | string | array $columnSpan = [
-        'default' => 1,
-        'md' => 2,
-        'lg' => 3,
-    ];
+    protected int | string | array $columnSpan = 1;
+
+    public static function canView(): bool
+    {
+        return false;
+    }
 
     protected function getData(): array
     {
@@ -80,5 +81,10 @@ class HourlyActivityChart extends ChartWidget
                 ],
             ],
         ];
+    }
+
+    protected function getMaxHeight(): ?string
+    {
+        return '320px';
     }
 }

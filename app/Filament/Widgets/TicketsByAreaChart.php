@@ -5,6 +5,7 @@ namespace App\Filament\Widgets;
 use App\Models\Area;
 use App\Models\Ticket;
 use Filament\Widgets\ChartWidget;
+use Filament\Support\RawJs;
 use Illuminate\Support\Facades\DB;
 
 class TicketsByAreaChart extends ChartWidget
@@ -13,11 +14,10 @@ class TicketsByAreaChart extends ChartWidget
     
     protected static ?int $sort = 6;
     
-    protected int | string | array $columnSpan = [
-        'default' => 1,
-        'md' => 2,
-        'lg' => 3,
-    ];
+    protected int | string | array $columnSpan = 1;
+
+    // Number of areas to display individually before grouping
+    protected int $maxDisplayAreas = 5;
     
     protected function getData(): array
     {
@@ -25,7 +25,6 @@ class TicketsByAreaChart extends ChartWidget
             ->with('area')
             ->groupBy('area_id')
             ->orderByDesc('count')
-            ->limit(10)
             ->get();
 
         $labels = [];
@@ -35,17 +34,28 @@ class TicketsByAreaChart extends ChartWidget
             'rgba(245, 158, 11, 0.8)',  // Amber
             'rgba(34, 197, 94, 0.8)',   // Green
             'rgba(59, 130, 246, 0.8)',  // Blue
-            'rgba(147, 51, 234, 0.8)',  // Purple
-            'rgba(236, 72, 153, 0.8)',  // Pink
-            'rgba(20, 184, 166, 0.8)',  // Teal
-            'rgba(251, 146, 60, 0.8)',  // Orange
-            'rgba(99, 102, 241, 0.8)',  // Indigo
             'rgba(168, 85, 247, 0.8)',  // Violet
         ];
 
-        foreach ($data as $index => $item) {
+        $topAreas = $data->take($this->maxDisplayAreas);
+        $remainingAreas = $data->skip($this->maxDisplayAreas);
+        
+        $remainingCount = 0;
+        foreach ($remainingAreas as $item) {
+            $remainingCount += $item->count;
+        }
+
+        $index = 0;
+        foreach ($topAreas as $item) {
             $labels[] = $item->area ? $item->area->name : 'Sin área';
             $chartData[] = $item->count;
+            $index++;
+        }
+
+        // Add "Otros" if there are remaining areas
+        if ($remainingCount > 0) {
+            $labels[] = 'Otros (' . $remainingAreas->count() . ' áreas)';
+            $chartData[] = $remainingCount;
         }
 
         return [
@@ -53,7 +63,8 @@ class TicketsByAreaChart extends ChartWidget
                 [
                     'data' => $chartData,
                     'backgroundColor' => array_slice($colors, 0, count($chartData)),
-                    'borderWidth' => 0,
+                    'borderWidth' => 2,
+                    'borderColor' => '#fff',
                 ],
             ],
             'labels' => $labels,
@@ -76,5 +87,10 @@ class TicketsByAreaChart extends ChartWidget
             ],
             'maintainAspectRatio' => false,
         ];
+    }
+
+    protected function getMaxHeight(): ?string
+    {
+        return '320px';
     }
 }

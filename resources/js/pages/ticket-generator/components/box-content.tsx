@@ -78,10 +78,10 @@ export default function BoxContent({
         <div
             onClick={handleOnClick}
             onDoubleClick={handleOnDoubleClick}
-            className={`p-4 min-h-32 flex items-center justify-center rounded-lg hover:shadow-lg transition-all cursor-pointer border-2 ${
+            className={`p-4 min-h-32 flex items-center justify-center transition-all cursor-pointer border ${
                 setStyles()
-                    ? 'bg-blue-600 text-white border-blue-700 shadow-lg'
-                    : 'bg-white text-gray-700 border-gray-300 hover:border-blue-400'
+                    ? 'bg-blue-700 text-white border-blue-800'
+                    : 'bg-white text-gray-700 border-gray-300 hover:border-blue-500'
             }`}
         >
             <h3 className="text-center font-semibold text-lg">

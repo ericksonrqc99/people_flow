@@ -26,7 +26,13 @@ class CitizenResource extends Resource
 {
     protected static ?string $model = Citizen::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-user-group';
+
+    protected static ?string $navigationLabel = 'Ciudadanos';
+
+    protected static ?string $modelLabel = 'Ciudadano';
+
+    protected static ?string $pluralModelLabel = 'Ciudadanos';
 
     public  bool $isReadOnlyCitizenData = true;
 
@@ -193,6 +199,7 @@ class CitizenResource extends Resource
         return $table
             ->deferLoading()
             ->paginationPageOptions([5, 20, 50, 100])
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('document_number')
                     ->label(__('DNI'))

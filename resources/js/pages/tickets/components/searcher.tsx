@@ -1,5 +1,3 @@
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 
 export default function Searcher({
@@ -10,20 +8,20 @@ export default function Searcher({
     setSearchTerm: (value: string) => void;
 }) {
     return (
-        <Card className="border-none shadow-md">
-            <CardContent className="p-6">
+        <div className="bg-white border border-gray-300">
+            <div className="p-3">
                 <div className="relative max-w-md">
-                    <div className="absolute left-3 top-3 text-gray-400">
-                        <Search className="h-5 w-5" />
+                    <div className="absolute left-3 top-2.5 text-gray-600">
+                        <Search className="h-4 w-4" />
                     </div>
-                    <Input
-                        placeholder="🔍 Buscar por código, DNI o nombre..."
+                    <input
+                        placeholder="Buscar por código, DNI o nombre..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-10 py-2.5 border-2 border-gray-300 rounded-lg focus:border-blue-600 focus:ring-2 focus:ring-blue-200 text-sm font-medium"
+                        className="w-full pl-9 py-2 border border-gray-300 focus:border-blue-700 focus:outline-none focus:ring-0 text-xs font-medium bg-white"
                     />
                 </div>
-            </CardContent>
-        </Card>
+            </div>
+        </div>
     );
 }

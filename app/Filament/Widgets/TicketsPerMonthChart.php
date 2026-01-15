@@ -8,23 +8,23 @@ use Illuminate\Support\Facades\DB;
 
 class TicketsPerMonthChart extends ChartWidget
 {
-    protected static ?string $heading = 'Tickets por Mes';
+    protected static ?string $heading = 'Total de Tickets Creados (Mensual)';
 
     protected static ?int $sort = 5;
     
-    protected int | string | array $columnSpan = [
-        'default' => 1,
-        'md' => 2,
-        'lg' => 3,
-    ];
+    protected int | string | array $columnSpan = 1;
+
+    public ?string $filter = null;
     
     protected function getData(): array
     {
+        $year = (int) ($this->filter ?? now()->year);
+
         $data = Ticket::select(
             DB::raw('MONTH(created_at) as month'),
             DB::raw('COUNT(*) as count')
         )
-        ->whereYear('created_at', date('Y'))
+        ->whereYear('created_at', $year)
         ->groupBy('month')
         ->orderBy('month')
         ->get();
@@ -73,7 +73,7 @@ class TicketsPerMonthChart extends ChartWidget
         return [
             'plugins' => [
                 'legend' => [
-                    'display' => true,
+                    'display' => false,
                 ],
             ],
             'scales' => [
@@ -83,4 +83,29 @@ class TicketsPerMonthChart extends ChartWidget
             ],
         ];
     }
+
+    protected function getMaxHeight(): ?string
+    {
+        return '320px';
+    }
+
+    protected function getFilters(): ?array
+    {
+        $years = Ticket::select(DB::raw('YEAR(created_at) as year'))
+            ->distinct()
+            ->orderBy('year', 'desc')
+            ->pluck('year')
+            ->map(fn ($year) => (string) $year)
+            ->all();
+
+        if (empty($years)) {
+            $currentYear = (string) now()->year;
+            return [$currentYear => $currentYear];
+        }
+
+        return collect($years)
+            ->mapWithKeys(fn (string $year): array => [$year => $year])
+            ->toArray();
+    }
 }
+

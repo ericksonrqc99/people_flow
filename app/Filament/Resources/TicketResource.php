@@ -17,7 +17,13 @@ class TicketResource extends Resource
 {
     protected static ?string $model = Ticket::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-ticket';
+
+    protected static ?string $navigationLabel = 'Tickets';
+
+    protected static ?string $modelLabel = 'Ticket';
+
+    protected static ?string $pluralModelLabel = 'Tickets';
 
     public static function form(Form $form): Form
     {
@@ -164,6 +170,7 @@ class TicketResource extends Resource
         return $table
             ->paginationPageOptions([5, 20, 50, 100])
             ->deferLoading()
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('code')
                     ->label('Código Interno')

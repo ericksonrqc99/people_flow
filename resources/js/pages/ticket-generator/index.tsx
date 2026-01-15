@@ -160,6 +160,18 @@ export default function TicketGenerator({ areas }: props) {
                     </div>
                 </div>
 
+                {/* Botón de Atrás - Fijo en la parte superior derecha */}
+                {screen !== 'areas' && screen !== 'search-citizen' && (
+                    <div className="flex justify-end flex-shrink-0 mb-2">
+                        <button
+                            onClick={handleClickBackArrow}
+                            className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1.5 transition-colors text-xs font-semibold"
+                        >
+                            ← Atrás
+                        </button>
+                    </div>
+                )}
+
                 {/* Contenido principal - Sin scroll */}
                 <div className="flex-1 overflow-hidden flex flex-col">
                     {screen === 'search-citizen' && (
@@ -182,19 +194,11 @@ export default function TicketGenerator({ areas }: props) {
 
                 {/* Botones de acción - Fijos en la parte inferior */}
                 {screen !== 'areas' && (
-                    <div className="flex justify-center gap-2 sm:gap-4 mt-3 sm:mt-4 flex-shrink-0">
-                        {screen !== 'search-citizen' && (
-                            <button
-                                onClick={handleClickBackArrow}
-                                className="bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-bold h-10 sm:h-12 cursor-pointer text-sm sm:text-base shadow-md transition-colors px-4 sm:px-6"
-                            >
-                                ← Atrás
-                            </button>
-                        )}
+                    <div className="flex justify-center gap-2 sm:gap-4 mt-3 sm:mt-4 flex-shrink-0 flex-wrap">
                         <button
                             disabled={handleDisabledButton()}
                             onClick={handleOnClickButton}
-                            className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed rounded-lg text-white font-bold h-10 sm:h-12 cursor-pointer text-sm sm:text-base shadow-md transition-colors px-4 sm:px-6 flex-1 sm:flex-initial"
+                            className="bg-gray-800 hover:bg-gray-900 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold h-10 sm:h-12 cursor-pointer text-sm sm:text-base transition-colors px-4 sm:px-6 border border-gray-900 disabled:border-gray-500"
                         >
                             {getButtonText()}
                         </button>

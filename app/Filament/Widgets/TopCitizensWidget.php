@@ -13,22 +13,16 @@ class TopCitizensWidget extends BaseWidget
 {
     protected static ?string $heading = 'Top 10 Ciudadanos Más Activos';
     
-    protected static ?int $sort = 10;
+    protected static ?int $sort = 20;
     
-    protected int | string | array $columnSpan = [
-        'default' => 1,
-        'md' => 2,
-        'lg' => 3,
-    ];
+    protected int | string | array $columnSpan = 'full';
 
     public function table(Table $table): Table
     {
         return $table
             ->query(
-                Citizen::select('citizens.id', 'citizens.names', 'citizens.first_surname', 'citizens.second_surname', 'citizens.document_number')
-                    ->join('tickets', 'citizens.id', '=', 'tickets.citizen_id')
-                    ->groupBy('citizens.id', 'citizens.names', 'citizens.first_surname', 'citizens.second_surname', 'citizens.document_number')
-                    ->selectRaw('COUNT(tickets.id) as tickets_count, MAX(tickets.created_at) as last_ticket')
+                Citizen::withCount('tickets')
+                    ->whereHas('tickets')
                     ->orderByDesc('tickets_count')
                     ->limit(10)
             )
@@ -63,14 +57,19 @@ class TopCitizensWidget extends BaseWidget
                     ->color('info')
                     ->icon('heroicon-m-ticket'),
 
-                Tables\Columns\TextColumn::make('last_ticket')
+                Tables\Columns\TextColumn::make('tickets.last.created_at')
                     ->label('Último Ticket')
+                    ->getStateUsing(function ($record) {
+                        $lastTicket = $record->tickets()->latest()->first();
+                        return $lastTicket?->created_at;
+                    })
                     ->since()
                     ->dateTimeTooltip()
                     ->icon('heroicon-m-clock')
                     ->color('gray'),
             ])
-            ->paginated(false)
+            ->paginated([10, 25, 50])
+            ->paginationPageOptions([10, 25, 50])
             ->emptyStateHeading('Sin datos de ciudadanos')
             ->emptyStateDescription('No se encontraron ciudadanos con tickets.')
             ->emptyStateIcon('heroicon-o-users');

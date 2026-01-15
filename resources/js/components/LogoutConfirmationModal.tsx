@@ -1,6 +1,4 @@
 import { AlertTriangle, LogOut, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface LogoutConfirmationModalProps {
     isOpen: boolean;
@@ -18,32 +16,28 @@ export default function LogoutConfirmationModal({
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-            <Card className="w-full max-w-md mx-4 shadow-2xl border-2">
-                <CardHeader className="pb-4">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                            <div className="flex items-center justify-center w-12 h-12 bg-red-100 rounded-full">
-                                <AlertTriangle className="w-6 h-6 text-red-600" />
-                            </div>
-                            <CardTitle className="text-xl font-bold text-gray-900">
-                                Confirmar cierre de sesión
-                            </CardTitle>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <div className="w-full max-w-md mx-4 border border-gray-300 rounded-none shadow bg-white">
+                <div className="bg-gray-700 text-white px-4 py-3 flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                        <div className="flex items-center justify-center w-10 h-10 bg-red-600 rounded-none">
+                            <AlertTriangle className="w-5 h-5 text-white" />
                         </div>
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={onCancel}
-                            className="h-8 w-8 p-0 hover:bg-gray-100"
-                        >
-                            <X className="w-4 h-4" />
-                        </Button>
+                        <h2 className="text-sm font-bold text-white">
+                            Confirmar cierre de sesión
+                        </h2>
                     </div>
-                </CardHeader>
+                    <button
+                        onClick={onCancel}
+                        className="h-7 w-7 p-0 text-white hover:bg-gray-600 transition-colors text-xs flex items-center justify-center"
+                    >
+                        <X className="w-4 h-4" />
+                    </button>
+                </div>
                 
-                <CardContent className="space-y-6">
-                    <div className="space-y-3">
-                        <p className="text-gray-700">
+                <div className="px-4 py-4 space-y-4 border-b border-gray-300">
+                    <div className="space-y-2">
+                        <p className="text-sm text-gray-700">
                             {userName ? (
                                 <>¿Estás seguro de que deseas cerrar la sesión, <strong>{userName}</strong>?</>
                             ) : (
@@ -54,25 +48,24 @@ export default function LogoutConfirmationModal({
                             Tendrás que volver a iniciar sesión para acceder al sistema de tickets.
                         </p>
                     </div>
-                    
-                    <div className="flex space-x-3 pt-4">
-                        <Button
-                            variant="outline"
-                            onClick={onCancel}
-                            className="flex-1 hover:bg-gray-50"
-                        >
-                            Cancelar
-                        </Button>
-                        <Button
-                            onClick={onConfirm}
-                            className="flex-1 bg-red-600 hover:bg-red-700 text-white"
-                        >
-                            <LogOut className="w-4 h-4 mr-2" />
-                            Cerrar sesión
-                        </Button>
-                    </div>
-                </CardContent>
-            </Card>
+                </div>
+                
+                <div className="flex gap-2 px-4 py-3">
+                    <button
+                        onClick={onCancel}
+                        className="flex-1 px-3 py-2 bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200 font-semibold text-sm transition-colors"
+                    >
+                        Cancelar
+                    </button>
+                    <button
+                        onClick={onConfirm}
+                        className="flex-1 px-3 py-2 bg-red-700 text-white border border-red-800 hover:bg-red-800 font-semibold text-sm transition-colors flex items-center justify-center gap-1"
+                    >
+                        <LogOut className="w-4 h-4" />
+                        Cerrar sesión
+                    </button>
+                </div>
+            </div>
         </div>
     );
 }

@@ -21,7 +21,13 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-users';
+
+    protected static ?string $navigationLabel = 'Usuarios';
+
+    protected static ?string $modelLabel = 'Usuario';
+
+    protected static ?string $pluralModelLabel = 'Usuarios';
 
     public static function form(Form $form): Form
     {
@@ -115,6 +121,7 @@ class UserResource extends Resource
             ->deferLoading()
             ->paginationPageOptions([5, 20, 50, 100])
             ->modifyQueryUsing(fn(Builder $query) => $query->where('id', '!=', Auth::id()))
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('Nombre'))

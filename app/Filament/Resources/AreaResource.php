@@ -20,7 +20,13 @@ class AreaResource extends Resource
 {
     protected static ?string $model = Area::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
+
+    protected static ?string $navigationLabel = 'Áreas';
+
+    protected static ?string $modelLabel = 'Área';
+
+    protected static ?string $pluralModelLabel = 'Áreas';
 
     public static function form(Form $form): Form
     {
@@ -96,6 +102,7 @@ class AreaResource extends Resource
         return $table
             ->deferLoading()
             ->paginationPageOptions([5, 20, 50, 100])
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('code')
                     ->label(__('Código'))

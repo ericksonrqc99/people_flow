@@ -34,11 +34,8 @@ class QuickStatsWidget extends BaseWidget
 
         // Áreas más ocupadas
         $busiestArea = Cache::remember('busiest_area', 300, function () {
-            return Area::select('areas.name')
-                ->join('tickets', 'areas.id', '=', 'tickets.area_id')
-                ->where('tickets.status_id', 6) // atendiendo
-                ->groupBy('areas.id', 'areas.name')
-                ->selectRaw('COUNT(tickets.id) as tickets_count')
+            return Area::select('areas.name', 'areas.id')
+                ->withCount('tickets')
                 ->orderByDesc('tickets_count')
                 ->first();
         });
@@ -65,7 +62,7 @@ class QuickStatsWidget extends BaseWidget
                 ->chart([$pendingTickets + 5, $pendingTickets + 3, $pendingTickets + 1, $pendingTickets]),
 
             Stat::make('🔥 Área Más Activa', $busiestArea ? $busiestArea->name : 'Sin datos')
-                ->description($busiestArea ? $busiestArea->tickets_count . ' tickets atendiendo' : 'No hay actividad')
+                ->description($busiestArea ? $busiestArea->tickets_count . ' tickets en total' : 'No hay áreas registradas')
                 ->descriptionIcon('heroicon-m-fire')
                 ->color('warning')
                 ->chart([2, 4, 6, 8, 10, 12, 15]),
