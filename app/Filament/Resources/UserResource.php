@@ -57,6 +57,12 @@ class UserResource extends Resource
                             ->placeholder('Ingresa el nombre completo')
                             ->helperText('Nombre y apellido del usuario administrativo')
                             ->columnSpanFull(),
+                        Forms\Components\TextInput::make('display_name')
+                            ->label(__('Nombre Visible / Cargo'))
+                            ->maxLength(255)
+                            ->placeholder('Ej: Caja 1')
+                            ->helperText('Nombre que se mostrará al llamar tickets')
+                            ->columnSpanFull(),
                         Forms\Components\TextInput::make('email')
                             ->label(__('Correo'))
                             ->email()
@@ -130,6 +136,13 @@ class UserResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->weight('bold'),
+                Tables\Columns\TextColumn::make('display_name')
+                    ->label(__('Nombre Visible'))
+                    ->badge()
+                    ->color('secondary')
+                    ->icon('heroicon-m-identification')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('email')
                     ->label(__('Correo'))
                     ->badge()

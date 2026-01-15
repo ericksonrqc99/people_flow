@@ -17,6 +17,7 @@ class TypesTableSeeder extends Seeder
             ['id' => 2, 'type' => 'subgerencia', 'model' => Area::class, 'created_at' => now(), 'updated_at' => now()],
             ['id' => 3, 'type' => 'unidad', 'model' => Area::class, 'created_at' => now(), 'updated_at' => now()],
             ['id' => 4, 'type' => 'oficina', 'model' => Area::class, 'created_at' => now(), 'updated_at' => now()],
+            ['id' => 9, 'type' => 'otros', 'model' => Area::class, 'created_at' => now(), 'updated_at' => now()],
 
             ['id' => 5, 'type' => 'en espera', 'model' => Ticket::class, 'created_at' => now(), 'updated_at' => now()],
             ['id' => 6, 'type' => 'atendiendo', 'model' => Ticket::class, 'created_at' => now(), 'updated_at' => now()],

@@ -22,6 +22,8 @@ export default function TicketsPage({ ...props }) {
         userHasActiveTicket = false,
         activeTicket = null,
     } = props;
+    const userFullName = user?.name || 'Usuario';
+    const userDisplayName = user?.display_name || user?.name || 'el módulo';
 
     // State
     const [ticketsData, setTicketsData] = useState<Ticket[]>(tickets);
@@ -180,8 +182,11 @@ export default function TicketsPage({ ...props }) {
 
             {/* Header */}
             <TicketPageHeader 
-                userName={user.name} 
+                userName={userFullName} 
+                displayName={userDisplayName}
                 areaName={user.area?.name} 
+                voiceEnabled={true}
+                onToggleVoice={() => {}}
             />
 
             {/* Active Ticket Banner */}

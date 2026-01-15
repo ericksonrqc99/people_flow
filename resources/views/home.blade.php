@@ -73,7 +73,7 @@
             <!-- Módulos Disponibles -->
             <div>
                 <h2 class="text-2xl font-bold text-gray-900 mb-6">Módulos Disponibles</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <!-- Módulo de Generación de Tickets -->
                     <div class="bg-white border border-gray-300 shadow hover:shadow-lg transition-shadow">
                         <div class="px-6 py-3 bg-blue-700 border-b border-blue-800">
@@ -108,6 +108,36 @@
                                     Acceso Restringido
                                 </button>
                             @endif
+                        </div>
+                    </div>
+
+                    <!-- Pantalla de Tickets (TV) -->
+                    <div class="bg-white border border-gray-300 shadow hover:shadow-lg transition-shadow">
+                        <div class="px-6 py-3 bg-yellow-700 border-b border-yellow-800">
+                            <h3 class="text-lg font-bold text-white">Pantalla de Tickets</h3>
+                        </div>
+                        <div class="p-6 space-y-4">
+                            <p class="text-gray-700 text-sm">
+                                Pantalla pública para mostrar tickets llamados y próximos en tiempo real.
+                            </p>
+                            <ul class="text-gray-600 text-sm space-y-2">
+                                <li class="flex items-center gap-2">
+                                    <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+                                    Visualización en pantallas de atención
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+                                    Actualización en tiempo real
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+                                    Selección de área a visualizar
+                                </li>
+                            </ul>
+                            <a href="{{ route('tickets.screen') }}" 
+                               class="block w-full text-center bg-yellow-700 hover:bg-yellow-800 text-white font-bold py-2 px-4 border border-yellow-800 transition-colors">
+                                Ver Pantalla
+                            </a>
                         </div>
                     </div>
 

@@ -1,16 +1,26 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { User, Building2, Clock, X, Eye, LogOut } from 'lucide-react';
+import { User, Building2, Clock, X, Eye, LogOut, Volume2, VolumeX } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import LogoutConfirmationModal from '@/components/LogoutConfirmationModal';
 
 interface TicketPageHeaderProps {
     userName: string;
+    displayName?: string;
     areaName?: string;
+    voiceEnabled: boolean;
+    onToggleVoice: () => void;
 }
 
-export default function TicketPageHeader({ userName, areaName }: TicketPageHeaderProps) {
+export default function TicketPageHeader({
+    userName,
+    displayName,
+    areaName,
+    voiceEnabled,
+    onToggleVoice,
+}: TicketPageHeaderProps) {
+    const displayLabel = displayName?.trim() || userName;
     // Inicializar desde localStorage o true por defecto
     const [isVisible, setIsVisible] = useState(() => {
         const saved = localStorage.getItem('ticketHeaderVisible');
@@ -84,7 +94,12 @@ export default function TicketPageHeader({ userName, areaName }: TicketPageHeade
                         <div className="flex items-center justify-center w-8 h-8 bg-blue-700 text-white text-xs font-bold">
                             {userName.charAt(0).toUpperCase()}
                         </div>
-                        <span className="text-xs font-semibold text-gray-800">{userName}</span>
+                        <div className="leading-tight">
+                            <p className="text-xs font-semibold text-gray-800">{userName}</p>
+                            {displayLabel && displayLabel !== userName && (
+                                <p className="text-[11px] text-gray-600">{displayLabel}</p>
+                            )}
+                        </div>
                         {areaName && (
                             <>
                                 <span className="text-gray-300">|</span>
@@ -93,6 +108,17 @@ export default function TicketPageHeader({ userName, areaName }: TicketPageHeade
                         )}
                     </div>
                     <div className="flex items-center space-x-2">
+                        <button
+                            onClick={onToggleVoice}
+                            className="h-7 w-7 p-0 text-gray-600 hover:bg-gray-100 transition-colors text-xs flex items-center justify-center"
+                            title={voiceEnabled ? 'Silenciar voz' : 'Activar voz'}
+                        >
+                            {voiceEnabled ? (
+                                <Volume2 className="w-3 h-3" />
+                            ) : (
+                                <VolumeX className="w-3 h-3" />
+                            )}
+                        </button>
                         <button
                             onClick={() => setIsVisible(true)}
                             className="h-7 px-2 text-blue-700 hover:bg-blue-50 text-xs font-semibold transition-colors border border-blue-700"
@@ -138,7 +164,7 @@ export default function TicketPageHeader({ userName, areaName }: TicketPageHeade
                                         {userName}
                                     </h2>
                                     <p className="text-xs text-gray-600">
-                                        Panel de Gestión
+                                        {displayLabel}
                                     </p>
                                 </div>
                             </div>
@@ -172,6 +198,17 @@ export default function TicketPageHeader({ userName, areaName }: TicketPageHeade
 
                             {/* Actions */}
                             <div className="flex items-center space-x-2 pl-3 border-l border-gray-300">
+                                <button
+                                    onClick={onToggleVoice}
+                                    className="h-7 w-7 p-0 text-gray-600 hover:bg-gray-100 transition-colors text-xs flex items-center justify-center"
+                                    title={voiceEnabled ? 'Silenciar voz' : 'Activar voz'}
+                                >
+                                    {voiceEnabled ? (
+                                        <Volume2 className="w-4 h-4" />
+                                    ) : (
+                                        <VolumeX className="w-4 h-4" />
+                                    )}
+                                </button>
                                 <button
                                     onClick={() => setIsVisible(false)}
                                     className="h-7 w-7 p-0 text-gray-600 hover:bg-gray-100 transition-colors text-xs flex items-center justify-center"

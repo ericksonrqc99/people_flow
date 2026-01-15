@@ -25,9 +25,24 @@ Route::get('/tickets/panel', [TicketController::class, 'ticketPanel'])
     ->middleware(['auth', 'no-cache', 'can:Ver Panel De Tickets'])
     ->name('ticket-visualizer');
 
+// ticket screen for citizens
+Route::get('/tickets/screen', [TicketController::class, 'ticketScreen'])
+    ->middleware(['no-cache'])
+    ->name('tickets.screen');
+
 Route::put('/tickets/panel', [TicketController::class, 'update'])
     ->middleware(['auth', 'no-cache'])
     ->name('tickets.update');
+
+// Call ticket (announce)
+Route::post('/tickets/call', [TicketController::class, 'callTicket'])
+    ->middleware(['auth', 'no-cache', 'can:Ver Panel De Tickets'])
+    ->name('tickets.call');
+
+// Stop calling ticket (release back to waiting)
+Route::post('/tickets/uncall', [TicketController::class, 'uncallTicket'])
+    ->middleware(['auth', 'no-cache', 'can:Ver Panel De Tickets'])
+    ->name('tickets.uncall');
 
 // Derive ticket to another area
 Route::post('/tickets/derive', [TicketController::class, 'derive'])

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Data\CitizenData;
 use App\Events\TicketCreated;
 use App\Events\TicketDerived;
+use App\Events\TicketCalled;
 use App\Events\UpdatedTicket;
 use App\Http\Requests\StoreTicketRequest;
 use App\Http\Requests\UpdateTicketRequest;
@@ -101,6 +102,162 @@ class TicketController extends Controller
                 'trace' => $th->getTraceAsString(),
             ]);
             return Inertia::render('info/index', ['message' => $this->thMessage]);
+        }
+    }
+
+    public function ticketScreen(Request $request)
+    {
+        try {
+            $areas = $this->areaService->getActiveAreas();
+            $areaId = $request->query('area_id');
+            $selectedArea = $areaId ? $this->areaService->getAreaById((int) $areaId) : null;
+
+            $tickets = $selectedArea
+                ? $this->ticketService->getTicketsTodayByArea($selectedArea)
+                : collect();
+
+            $activeTicket = $tickets->first(function ($ticket) {
+                return $ticket->status?->type === 'atendiendo';
+            });
+
+            $waitingTickets = $tickets
+                ->filter(function ($ticket) {
+                    return $ticket->status?->type === 'en espera' && ! $ticket->called_at;
+                })
+                ->values();
+
+            $calledTickets = $selectedArea
+                ? Ticket::with(['calledBy', 'citizen'])
+                    ->where('area_id', $selectedArea->id)
+                    ->whereNotNull('called_at')
+                    ->whereDate('called_at', now()->toDateString())
+                    ->whereHas('status', function ($query) {
+                        $query->whereIn('type', ['en espera', 'atendiendo']);
+                    })
+                    ->orderByDesc('called_at')
+                    ->limit(10)
+                    ->get()
+                : collect();
+
+            $lastCaller = $calledTickets->first()?->calledBy;
+
+            return Inertia::render('tickets/screen', [
+                'areas' => $areas,
+                'area' => $selectedArea,
+                'activeTicket' => $activeTicket,
+                'waitingTickets' => $waitingTickets,
+                'calledTickets' => $calledTickets,
+                'lastCaller' => $lastCaller,
+            ]);
+        } catch (\Throwable $th) {
+            Log::error('Error in TicketController@ticketScreen', [
+                'message' => $th->getMessage(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine(),
+                'trace' => $th->getTraceAsString(),
+            ]);
+            return Inertia::render('info/index', ['message' => $this->thMessage]);
+        }
+    }
+
+    public function callTicket(Request $request)
+    {
+        try {
+            $ticketId = (int) $request->input('ticket_id');
+            $user = Auth::user();
+
+            if (! $user) {
+                return response()->json(['message' => 'Usuario no autenticado'], 401);
+            }
+
+            $ticket = Ticket::with(['area', 'citizen', 'status', 'attendedBy', 'calledBy'])
+                ->where('id', $ticketId)
+                ->first();
+
+            if (! $ticket) {
+                return response()->json(['message' => 'Ticket no encontrado'], 404);
+            }
+
+            if ($user->area_id && $ticket->area_id !== $user->area_id) {
+                return response()->json(['message' => 'No autorizado para este ticket'], 403);
+            }
+
+            $ticket->called_at = now();
+            $ticket->called_by_id = $user->id;
+            $ticket->save();
+
+            $ticket = $ticket->refresh()->load(['area', 'citizen', 'status', 'attendedBy', 'calledBy']);
+
+            UpdatedTicket::dispatch($ticket);
+            TicketCalled::dispatch($ticket);
+
+            return response()->json([
+                'ok' => true,
+                'ticket' => $ticket->fresh(['area', 'citizen', 'status', 'attendedBy', 'calledBy']),
+            ]);
+        } catch (\Throwable $th) {
+            Log::error('Error in TicketController@callTicket', [
+                'message' => $th->getMessage(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine(),
+                'trace' => $th->getTraceAsString(),
+                'request_data' => $request->all(),
+            ]);
+
+            return response()->json([
+                'ok' => false,
+                'message' => $this->thMessage,
+            ], 500);
+        }
+    }
+
+    public function uncallTicket(Request $request)
+    {
+        try {
+            $ticketId = (int) $request->input('ticket_id');
+            $user = Auth::user();
+
+            if (! $user) {
+                return response()->json(['message' => 'Usuario no autenticado'], 401);
+            }
+
+            $ticket = Ticket::with(['area', 'citizen', 'status', 'attendedBy', 'calledBy'])
+                ->where('id', $ticketId)
+                ->first();
+
+            if (! $ticket) {
+                return response()->json(['message' => 'Ticket no encontrado'], 404);
+            }
+
+            if ($user->area_id && $ticket->area_id !== $user->area_id) {
+                return response()->json(['message' => 'No autorizado para este ticket'], 403);
+            }
+
+            $ticket->called_at = null;
+            $ticket->called_by_id = null;
+            $ticket->save();
+
+            $ticket = $ticket->refresh()->load(['area', 'citizen', 'status', 'attendedBy', 'calledBy']);
+
+            UpdatedTicket::dispatch($ticket);
+
+            return response()->json([
+                'ok' => true,
+                'ticket' => $ticket->fresh(['area', 'citizen', 'status', 'attendedBy', 'calledBy']),
+            ]);
+        } catch (\Throwable $th) {
+            Log::error('Error in TicketController@uncallTicket', [
+                'message' => $th->getMessage(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine(),
+                'trace' => $th->getTraceAsString(),
+                'request_data' => $request->all(),
+            ]);
+
+            return response()->json([
+                'ok' => false,
+                'message' => $this->thMessage,
+            ], 500);
         }
     }
 

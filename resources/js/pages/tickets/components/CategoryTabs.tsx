@@ -8,6 +8,8 @@ interface CategoryTabsProps {
     getFilteredTickets: () => Ticket[];
     openTakeModal: (ticket: Ticket) => void;
     openViewModal: (ticket: Ticket) => void;
+    onCallTicket: (ticket: Ticket) => void;
+    onStopCallTicket: (ticket: Ticket) => void;
 }
 
 export default function CategoryTabs({
@@ -16,7 +18,9 @@ export default function CategoryTabs({
     ticketsData,
     getFilteredTickets,
     openTakeModal,
-    openViewModal
+    openViewModal,
+    onCallTicket,
+    onStopCallTicket
 }: CategoryTabsProps) {
     const getStatusText = (status: string) => {
         switch (status) {
@@ -132,10 +136,25 @@ export default function CategoryTabs({
                                 </p>
                             </div>
 
-                            {/* Area Info */}
+                            {/* Observations */}
+                            <div className="text-xs text-gray-600">
+                                <p className="font-semibold text-gray-700">Observaciones:</p>
+                                <p className="text-gray-600 line-clamp-2">
+                                    {ticket.observations?.trim() || 'Sin observaciones'}
+                                </p>
+                            </div>
+
+                            {/* Created At */}
                             <div className="p-1 bg-gray-50 border-l-4 border-l-blue-700 text-xs">
                                 <p className="text-gray-700">
-                                    <span className="font-semibold">Área:</span> {ticket.area?.name}
+                                    <span className="font-semibold">Creado:</span>{' '}
+                                    {new Date(ticket.created_at).toLocaleString('es-ES', {
+                                        year: 'numeric',
+                                        month: '2-digit',
+                                        day: '2-digit',
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                    })}
                                 </p>
                             </div>
 
@@ -152,7 +171,7 @@ export default function CategoryTabs({
                                     onClick={() => openViewModal(ticket)}
                                     className="flex-1 px-2 py-1 bg-gray-100 text-gray-700 text-xs font-semibold hover:bg-gray-200 transition-colors border border-gray-300"
                                 >
-                                    Ver
+                                    Observaciones
                                 </button>
                                 {ticket.status?.type === 'en espera' && (
                                     <button
@@ -163,6 +182,28 @@ export default function CategoryTabs({
                                     </button>
                                 )}
                             </div>
+                            {ticket.status?.type === 'en espera' && (
+                                <div className="pt-2 flex items-center gap-2">
+                                    <button
+                                        onClick={() => onCallTicket(ticket)}
+                                        className="flex-1 px-2 py-1 bg-blue-700 text-white text-xs font-semibold hover:bg-blue-800 transition-colors border border-blue-800"
+                                    >
+                                        Llamar
+                                    </button>
+                                    <button
+                                        onClick={() => onStopCallTicket(ticket)}
+                                        disabled={!ticket.called_at}
+                                        title="Dejar de llamar"
+                                        className={`px-2 py-1 text-xs font-semibold border transition-colors ${
+                                            ticket.called_at
+                                                ? 'bg-yellow-100 text-yellow-800 border-yellow-300 hover:bg-yellow-200'
+                                                : 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                                        }`}
+                                    >
+                                        Stop
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
                 ))}

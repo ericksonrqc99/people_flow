@@ -15,6 +15,7 @@ class UsersTableSeeder extends Seeder
 
         DB::table('users')->insert([
             'name' => 'Super Admin',
+            'display_name' => 'Super Admin',
             'email' => env('SUPER_ADMIN_EMAIL', 'admin@admin.com'),
             'password' => $hashedPassword,
         ]);

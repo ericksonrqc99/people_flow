@@ -71,6 +71,7 @@ export const useTicketEcho = (
     onTicketCreated: (data: any) => void,
     onTicketUpdated: (data: any) => void,
     onTicketDerived?: (data: any) => void,
+    onTicketCalled?: (data: any) => void,
 ): EchoHookResult => {
     const channels: EchoChannel[] = [
         {
@@ -91,6 +92,14 @@ export const useTicketEcho = (
             channel: `ticket-derived.${userId}`,
             event: 'TicketDerived',
             callback: onTicketDerived,
+        });
+    }
+
+    if (onTicketCalled) {
+        channels.push({
+            channel: `ticket-called.${userId}`,
+            event: 'TicketCalled',
+            callback: onTicketCalled,
         });
     }
 

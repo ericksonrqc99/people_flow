@@ -12,6 +12,8 @@ export const TicketSchema = z.object({
     status_id: z.coerce.number(),
     time_admission: z.string().nullable(),
     time_departure: z.string().nullable(),
+    called_at: z.string().nullable().optional(),
+    called_by_id: z.coerce.number().nullable().optional(),
     observations: z.string().nullable(),
     created_at: z.string(),
     updated_at: z.string(),
@@ -22,6 +24,7 @@ export const TicketSchema = z.object({
     status: z.any().optional(),
     registered_by: z.any().optional(),
     attended_by: z.any().optional().nullable(),
+    called_by: z.any().optional().nullable(),
 });
 
 // Schema para datos que envías al backend (para update)

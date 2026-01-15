@@ -34,6 +34,11 @@ class Ticket extends Model
         return $this->belongsTo(User::class, 'attended_by_id');
     }
 
+    public function calledBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'called_by_id');
+    }
+
     public function ticketStatus(): MorphMany
     {
         return $this->morphMany(Type::class, 'typeable');

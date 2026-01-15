@@ -368,6 +368,30 @@ class AreasTableSeeder extends Seeder
                 'updated_at' => now(),
                 'short_name' => 'PROGRAMAS SOCIALES',
             ],
+            [
+                'id' => 29,
+                'name' => 'CAJA GAT',
+                'code' => 'CGAT',
+                'description' => 'CAJA GAT',
+                'is_active' => true,
+                'parent_id' => 13,
+                'type_id' => 9,
+                'created_at' => now(),
+                'updated_at' => now(),
+                'short_name' => 'CAJA GAT',
+            ],
+            [
+                'id' => 30,
+                'name' => 'VENTANILLA GAT',
+                'code' => 'VGAT',
+                'description' => 'VENTANILLA GAT',
+                'is_active' => true,
+                'parent_id' => 13,
+                'type_id' => 9,
+                'created_at' => now(),
+                'updated_at' => now(),
+                'short_name' => 'VENTANILLA GAT',
+            ],
         ]);
     }
 }

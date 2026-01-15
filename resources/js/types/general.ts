@@ -41,6 +41,7 @@ export type CitizenResponseT = {
 export type User = {
     id: number;
     name?: string;
+    display_name?: string;
     email?: string;
     area_id?: string;
     is_active?: boolean;

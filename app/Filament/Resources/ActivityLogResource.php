@@ -3,9 +3,11 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ActivityLogResource\Pages;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\HtmlString;
 use Spatie\Activitylog\Models\Activity;
 
@@ -118,7 +120,8 @@ class ActivityLogResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('subject_id')
                     ->label('ID')
-                    ->sortable(),
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('causer.name')
                     ->label('Usuario')
                     ->default('Sistema')
@@ -137,8 +140,29 @@ class ActivityLogResource extends Resource
                         ->whereNotNull('log_name')
                         ->pluck('log_name', 'log_name')
                         ->toArray()),
+                Tables\Filters\Filter::make('subject_id')
+                    ->form([
+                        TextInput::make('subject_id')
+                            ->label('ID')
+                            ->placeholder('Buscar por ID')
+                            ->numeric(),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query->when(
+                            $data['subject_id'] ?? null,
+                            fn (Builder $query, $subjectId) => $query->where('subject_id', $subjectId),
+                        );
+                    }),
             ])
-            ->actions([])
+            ->actions([
+                Tables\Actions\Action::make('ver_logs')
+                    ->label('Ver historial de ID')
+                    ->icon('heroicon-m-arrow-top-right-on-square')
+                    ->url(fn ($record) => route('filament.admin.resources.activity-logs.subject', [
+                        'subjectId' => $record->subject_id,
+                    ]))
+                    ->openUrlInNewTab(),
+            ])
             ->bulkActions([]);
     }
 
@@ -146,6 +170,7 @@ class ActivityLogResource extends Resource
     {
         return [
             'index' => Pages\ListActivityLogs::route('/'),
+            'subject' => Pages\SubjectActivityLogs::route('/subject/{subjectId}'),
         ];
     }
 }

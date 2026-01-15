@@ -26,6 +26,8 @@ export default function TicketsPage({ ...props }) {
         activeTicket = null,
         areas = [],
     } = props;
+    const userFullName = user?.name || 'Usuario';
+    const userDisplayName = user?.display_name || user?.name || 'el módulo';
 
     // State
     const [ticketsData, setTicketsData] = useState<Ticket[]>(() => {
@@ -70,6 +72,11 @@ export default function TicketsPage({ ...props }) {
     });
 
     const notificationSound = useRef<HTMLAudioElement | null>(null);
+    const [isVoiceEnabled, setIsVoiceEnabled] = useState<boolean>(() => {
+        if (typeof window === 'undefined') return true;
+        const saved = localStorage.getItem('ticketsVoiceEnabled');
+        return saved !== null ? JSON.parse(saved) : true;
+    });
 
     // Ticket actions hook
     const { handleTakeTicket, handleCloseTicket, handleReleaseTicket } =
@@ -153,6 +160,11 @@ export default function TicketsPage({ ...props }) {
         }
     }, [hasActiveTicket, currentActiveTicket, focusedTicket]);
 
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        localStorage.setItem('ticketsVoiceEnabled', JSON.stringify(isVoiceEnabled));
+    }, [isVoiceEnabled]);
+
     // Filter tickets
     const getFilteredTickets = () => {
         return ticketsData.filter((ticket) => {
@@ -192,6 +204,81 @@ export default function TicketsPage({ ...props }) {
     const openViewModal = (ticket: Ticket) => {
         setSelectedTicket(ticket);
         setShowViewModal(true);
+    };
+
+    const handleCallTicket = async (ticket: Ticket) => {
+        const code = ticket.visible_code ?? '';
+        const message = `Ticket ${code}, pasar con ${userDisplayName}. Ticket ${code}, pasar con ${userDisplayName}`;
+
+        if (isVoiceEnabled && typeof window !== 'undefined' && window.speechSynthesis) {
+            const synth = window.speechSynthesis;
+            const speakMessage = () => {
+                const utterance = new SpeechSynthesisUtterance(message);
+                utterance.lang = 'es-PE';
+                utterance.rate = 0.9;
+                utterance.pitch = 1.05;
+                utterance.volume = 1;
+
+                const voices = synth.getVoices();
+                const esVoice =
+                    voices.find((voice) =>
+                        /google|microsoft|natural|neural/i.test(voice.name),
+                    ) ||
+                    voices.find((voice) => voice.lang?.toLowerCase().startsWith('es')) ||
+                    voices[0];
+                if (esVoice) {
+                    utterance.voice = esVoice;
+                }
+
+                synth.cancel();
+                setTimeout(() => {
+                    synth.speak(utterance);
+                    if (synth.paused) {
+                        synth.resume();
+                    }
+                }, 150);
+            };
+
+            if (synth.getVoices().length === 0) {
+                const previousHandler = synth.onvoiceschanged;
+                synth.onvoiceschanged = () => {
+                    speakMessage();
+                    synth.onvoiceschanged = previousHandler ?? null;
+                };
+            } else {
+                speakMessage();
+            }
+        }
+
+        try {
+            const res = await axios.post(route('tickets.call'), {
+                ticket_id: ticket.id,
+            });
+
+            if (res.data?.ticket) {
+                setTicketsData((prev) =>
+                    prev.map((t) => (t.id === ticket.id ? res.data.ticket : t)),
+                );
+            }
+        } catch (error) {
+            console.error('Error al llamar ticket:', error);
+        }
+    };
+
+    const handleStopCallTicket = async (ticket: Ticket) => {
+        try {
+            const res = await axios.post(route('tickets.uncall'), {
+                ticket_id: ticket.id,
+            });
+
+            if (res.data?.ticket) {
+                setTicketsData((prev) =>
+                    prev.map((t) => (t.id === ticket.id ? res.data.ticket : t)),
+                );
+            }
+        } catch (error) {
+            console.error('Error al liberar ticket llamado:', error);
+        }
     };
 
     // Action handlers with proper signatures
@@ -289,7 +376,13 @@ export default function TicketsPage({ ...props }) {
                 />
 
                 {/* Header */}
-                <TicketPageHeader userName={user.name} areaName={user.area?.name} />
+                <TicketPageHeader
+                    userName={userFullName}
+                    displayName={userDisplayName}
+                    areaName={user.area?.name}
+                    voiceEnabled={isVoiceEnabled}
+                    onToggleVoice={() => setIsVoiceEnabled((prev) => !prev)}
+                />
 
                 {/* Active Ticket Banner - solo mostrar si no hay focused ticket */}
                 {hasActiveTicket && currentActiveTicket && !focusedTicket && (
@@ -322,6 +415,8 @@ export default function TicketsPage({ ...props }) {
                             getFilteredTickets={getFilteredTickets}
                             openTakeModal={openTakeModal}
                             openViewModal={openViewModal}
+                            onCallTicket={handleCallTicket}
+                            onStopCallTicket={handleStopCallTicket}
                         />
                     </>
                 )}

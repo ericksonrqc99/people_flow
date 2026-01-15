@@ -191,54 +191,16 @@ export default function TicketModals({
             {/* View Ticket Modal */}
             <Dialog open={showViewModal} onOpenChange={setShowViewModal}>
                 <DialogContent className="max-w-2xl border border-gray-300 rounded-none shadow-none p-0">
-                    <ModalHeader title="Detalles del Ticket" />
+                    <ModalHeader title="Observaciones del Ticket" />
                     <div className="px-4 py-3">
                         {selectedTicket && (
-                            <div className="space-y-3">
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div>
-                                        <p className="text-sm font-semibold text-gray-700 mb-1">Código</p>
-                                        <p className="text-sm text-gray-900">{selectedTicket.visible_code}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-semibold text-gray-700 mb-1">Estado</p>
-                                        <p className="text-sm text-gray-900">{selectedTicket.status?.type}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-semibold text-gray-700 mb-1">Ciudadano</p>
-                                        <p className="text-sm text-gray-900">
-                                            {[
-                                                selectedTicket.citizen?.names,
-                                                selectedTicket.citizen?.first_surname,
-                                                selectedTicket.citizen?.second_surname
-                                            ].filter(Boolean).join(' ')}
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-semibold text-gray-700 mb-1">DNI</p>
-                                        <p className="text-sm text-gray-900">{selectedTicket.citizen?.document_number}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-semibold text-gray-700 mb-1">Área</p>
-                                        <p className="text-sm text-gray-900">{selectedTicket.area?.name}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-semibold text-gray-700 mb-1">Fecha de creación</p>
-                                        <p className="text-sm text-gray-900">
-                                            {new Date(selectedTicket.created_at).toLocaleString()}
-                                        </p>
-                                    </div>
+                            <div className="mt-2 p-2 bg-gray-50 border border-gray-300">
+                                <p className="text-sm font-semibold text-gray-900 mb-1">
+                                    Observaciones
+                                </p>
+                                <div className="bg-white p-2 border border-gray-300 min-h-[80px] max-h-[220px] overflow-y-auto text-sm text-gray-700 whitespace-pre-wrap break-words">
+                                    {selectedTicket.observations?.trim() || 'Sin observaciones'}
                                 </div>
-                                {selectedTicket.observations && (
-                                    <div className="mt-2 p-2 bg-gray-50 border border-gray-300">
-                                        <p className="text-sm font-semibold text-gray-900 mb-1">
-                                            Observaciones
-                                        </p>
-                                        <div className="bg-white p-2 border border-gray-300 min-h-[60px] max-h-[150px] overflow-y-auto text-sm text-gray-700 whitespace-pre-wrap break-words">
-                                            {selectedTicket.observations}
-                                        </div>
-                                    </div>
-                                )}
                             </div>
                         )}
                     </div>
