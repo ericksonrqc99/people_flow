@@ -16,7 +16,7 @@ import TicketModals from './components/TicketModals';
 
 export default function TicketsPage({ ...props }) {
     const {
-        auth: { user },
+        auth: { user, permissions = [] },
         tickets,
         ticketTypes,
         userHasActiveTicket = false,
@@ -24,6 +24,9 @@ export default function TicketsPage({ ...props }) {
     } = props;
     const userFullName = user?.name || 'Usuario';
     const userDisplayName = user?.display_name || user?.name || 'el módulo';
+    const canCallTickets = Array.isArray(permissions)
+        ? permissions.includes('Ver Boton llamar en Panel de Tickets')
+        : false;
 
     // State
     const [ticketsData, setTicketsData] = useState<Ticket[]>(tickets);
@@ -187,6 +190,7 @@ export default function TicketsPage({ ...props }) {
                 areaName={user.area?.name} 
                 voiceEnabled={true}
                 onToggleVoice={() => {}}
+                showVoiceToggle={canCallTickets}
             />
 
             {/* Active Ticket Banner */}

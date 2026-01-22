@@ -213,7 +213,7 @@ return [
             //'view-log'
             'Ver Panel De Tickets',
             'Ver Modulo de Tickets',
-            "Ver Boton llamar Ticket",
+            "Ver Boton llamar en Panel de Tickets",
         ],
 
         'user_model' => \App\Models\User::class,

@@ -7,6 +7,7 @@ import { useTicketEcho } from '@/hooks/useMultipleEcho';
 import { useTicketActions } from '@/hooks/useTicketActions';
 import { Ticket } from '@/types/general';
 import { TicketSchema } from '@/schemas/ticket';
+import { speakText } from '@/lib/speechSynthesis';
 
 // Components
 import TicketPageHeader from './components/TicketPageHeader';
@@ -19,7 +20,7 @@ import TicketModals from './components/TicketModals';
 
 export default function TicketsPage({ ...props }) {
     const {
-        auth: { user },
+        auth: { user, permissions = [] },
         tickets,
         ticketTypes,
         userHasActiveTicket = false,
@@ -28,6 +29,9 @@ export default function TicketsPage({ ...props }) {
     } = props;
     const userFullName = user?.name || 'Usuario';
     const userDisplayName = user?.display_name || user?.name || 'el módulo';
+    const canCallTickets = Array.isArray(permissions)
+        ? permissions.includes('Ver Boton llamar en Panel de Tickets')
+        : false;
 
     // State
     const [ticketsData, setTicketsData] = useState<Ticket[]>(() => {
@@ -162,7 +166,10 @@ export default function TicketsPage({ ...props }) {
 
     useEffect(() => {
         if (typeof window === 'undefined') return;
-        localStorage.setItem('ticketsVoiceEnabled', JSON.stringify(isVoiceEnabled));
+        localStorage.setItem(
+            'ticketsVoiceEnabled',
+            JSON.stringify(isVoiceEnabled),
+        );
     }, [isVoiceEnabled]);
 
     // Filter tickets
@@ -207,47 +214,28 @@ export default function TicketsPage({ ...props }) {
     };
 
     const handleCallTicket = async (ticket: Ticket) => {
-        const code = ticket.visible_code ?? '';
-        const message = `Ticket ${code}, pasar con ${userDisplayName}. Ticket ${code}, pasar con ${userDisplayName}`;
+        const rawCode = (ticket.visible_code ?? '').trim();
+        const cleanedCode = rawCode.replace(/[^A-Za-z0-9Ñ]+/g, ' ').trim();
+        const upperCode = cleanedCode.toUpperCase();
+        const speakableCode = upperCode
+                        ? upperCode
+                                    .split('')
+                                    .filter((char) => /[A-Z0-9Ñ]/.test(char))
+                                    .join(', ')
+            : '';
+        const message = `Ticket ${speakableCode}. Pase a ${userDisplayName}. Ticket ${speakableCode}. Pase a ${userDisplayName}.`;
 
-        if (isVoiceEnabled && typeof window !== 'undefined' && window.speechSynthesis) {
-            const synth = window.speechSynthesis;
-            const speakMessage = () => {
-                const utterance = new SpeechSynthesisUtterance(message);
-                utterance.lang = 'es-PE';
-                utterance.rate = 0.9;
-                utterance.pitch = 1.05;
-                utterance.volume = 1;
-
-                const voices = synth.getVoices();
-                const esVoice =
-                    voices.find((voice) =>
-                        /google|microsoft|natural|neural/i.test(voice.name),
-                    ) ||
-                    voices.find((voice) => voice.lang?.toLowerCase().startsWith('es')) ||
-                    voices[0];
-                if (esVoice) {
-                    utterance.voice = esVoice;
-                }
-
-                synth.cancel();
-                setTimeout(() => {
-                    synth.speak(utterance);
-                    if (synth.paused) {
-                        synth.resume();
-                    }
-                }, 150);
-            };
-
-            if (synth.getVoices().length === 0) {
-                const previousHandler = synth.onvoiceschanged;
-                synth.onvoiceschanged = () => {
-                    speakMessage();
-                    synth.onvoiceschanged = previousHandler ?? null;
-                };
-            } else {
-                speakMessage();
-            }
+        if (isVoiceEnabled) {
+            speakText(message, {
+                lang: 'es-PE',
+                rate: 1.5,
+                pitch: 1.0,
+                volume: 1,
+                preferLangs: ['es-pe', 'es'],
+                namePattern: /google|microsoft|natural|neural/i,
+                delayMs: 30,
+                cancelDelayMs: 120,
+            });
         }
 
         try {
@@ -382,6 +370,7 @@ export default function TicketsPage({ ...props }) {
                     areaName={user.area?.name}
                     voiceEnabled={isVoiceEnabled}
                     onToggleVoice={() => setIsVoiceEnabled((prev) => !prev)}
+                    showVoiceToggle={canCallTickets}
                 />
 
                 {/* Active Ticket Banner - solo mostrar si no hay focused ticket */}
@@ -417,6 +406,7 @@ export default function TicketsPage({ ...props }) {
                             openViewModal={openViewModal}
                             onCallTicket={handleCallTicket}
                             onStopCallTicket={handleStopCallTicket}
+                            canCallTickets={canCallTickets}
                         />
                     </>
                 )}

@@ -9,7 +9,7 @@ class AreasTableSeeder extends Seeder
 {
     public function run()
     {
-        DB::table('areas')->insert([
+        DB::table('areas')->upsert([
 
             // --------------------
             // OFICINAS
@@ -17,7 +17,7 @@ class AreasTableSeeder extends Seeder
             [
                 'id' => 1,
                 'name' => 'OFICINA GENERAL DE ATENCION AL CIUDADANO Y GESTION DOCUMENTAL',
-                'code' => 'OGACGD',
+                'code' => 'OGAC',
                 'description' => 'OFICINA GENERAL DE ATENCION AL CIUDADANO Y GESTION DOCUMENTAL',
                 'is_active' => true,
                 'parent_id' => null,
@@ -191,7 +191,7 @@ class AreasTableSeeder extends Seeder
             [
                 'id' => 15,
                 'name' => 'SUB GERENCIA DE FISCALIZACION Y EJECUCION COACTIVA',
-                'code' => 'SGFEC',
+                'code' => 'SFEC',
                 'description' => 'SUB GERENCIA DE FISCALIZACION Y EJECUCION COACTIVA',
                 'is_active' => true,
                 'parent_id' => 13,
@@ -218,7 +218,7 @@ class AreasTableSeeder extends Seeder
             [
                 'id' => 17,
                 'name' => 'SUB GERENCIA DE DESARROLLO ECONOMICO Y PRODUCTIVO',
-                'code' => 'SGDEP',
+                'code' => 'SDEP',
                 'description' => 'SUB GERENCIA DE DESARROLLO ECONOMICO Y PRODUCTIVO',
                 'is_active' => true,
                 'parent_id' => 16,
@@ -230,7 +230,7 @@ class AreasTableSeeder extends Seeder
             [
                 'id' => 18,
                 'name' => 'SUB GERENCIA DE COMERCIO, LICENCIAS Y CONTROL SANITARIO',
-                'code' => 'SGCLCS',
+                'code' => 'SCLC',
                 'description' => 'SUB GERENCIA DE COMERCIO, LICENCIAS Y CONTROL SANITARIO',
                 'is_active' => true,
                 'parent_id' => 16,
@@ -296,7 +296,7 @@ class AreasTableSeeder extends Seeder
             [
                 'id' => 23,
                 'name' => 'SUB GERENCIA DE PARTICIPACION Y SEGURIDAD CIUDADANA',
-                'code' => 'SGPSC',
+                'code' => 'SPSC',
                 'description' => 'SUB GERENCIA DE PARTICIPACION Y SEGURIDAD CIUDADANA',
                 'is_active' => true,
                 'parent_id' => 22,
@@ -392,6 +392,15 @@ class AreasTableSeeder extends Seeder
                 'updated_at' => now(),
                 'short_name' => 'VENTANILLA GAT',
             ],
+        ], ['id'], [
+            'name',
+            'code',
+            'description',
+            'is_active',
+            'parent_id',
+            'type_id',
+            'short_name',
+            'updated_at',
         ]);
     }
 }

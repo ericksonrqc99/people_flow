@@ -10,6 +10,7 @@ interface CategoryTabsProps {
     openViewModal: (ticket: Ticket) => void;
     onCallTicket: (ticket: Ticket) => void;
     onStopCallTicket: (ticket: Ticket) => void;
+    canCallTickets: boolean;
 }
 
 export default function CategoryTabs({
@@ -20,7 +21,8 @@ export default function CategoryTabs({
     openTakeModal,
     openViewModal,
     onCallTicket,
-    onStopCallTicket
+    onStopCallTicket,
+    canCallTickets
 }: CategoryTabsProps) {
     const getStatusText = (status: string) => {
         switch (status) {
@@ -182,7 +184,7 @@ export default function CategoryTabs({
                                     </button>
                                 )}
                             </div>
-                            {ticket.status?.type === 'en espera' && (
+                            {canCallTickets && ticket.status?.type === 'en espera' && (
                                 <div className="pt-2 flex items-center gap-2">
                                     <button
                                         onClick={() => onCallTicket(ticket)}

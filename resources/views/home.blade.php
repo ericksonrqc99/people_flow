@@ -25,27 +25,27 @@
                         <p class="text-gray-300 text-sm mt-1">Municipalidad de San Miguel - San Román</p>
                     </div>
                     @if (Auth::check())
-                        <div class="flex items-center gap-4 bg-gray-800 px-4 py-3 rounded border border-gray-600">
-                            <div class="text-right">
-                                <p class="text-sm font-semibold">{{ Auth::user()->name }}</p>
-                                @if (Auth::user()->area)
-                                    <p class="text-xs text-gray-300">{{ Auth::user()->area->name }}</p>
-                                @endif
-                            </div>
-                            <div class="w-10 h-10 bg-blue-700 flex items-center justify-center font-bold rounded">
-                                {{ substr(Auth::user()->name, 0, 1) }}
-                            </div>
-                            <form action="{{ route('logout') }}" method="POST">
-                                @csrf
-                                <button type="submit" class="bg-red-700 hover:bg-red-800 text-white font-bold py-1 px-3 text-sm border border-red-800 transition-colors">
-                                    Cerrar Sesión
-                                </button>
-                            </form>
+                    <div class="flex items-center gap-4 bg-gray-800 px-4 py-3 rounded border border-gray-600">
+                        <div class="text-right">
+                            <p class="text-sm font-semibold">{{ Auth::user()->name }}</p>
+                            @if (Auth::user()->area)
+                            <p class="text-xs text-gray-300">{{ Auth::user()->area->name }}</p>
+                            @endif
                         </div>
+                        <div class="w-10 h-10 bg-blue-700 flex items-center justify-center font-bold rounded">
+                            {{ substr(Auth::user()->name, 0, 1) }}
+                        </div>
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="bg-red-700 hover:bg-red-800 text-white font-bold py-1 px-3 text-sm border border-red-800 transition-colors">
+                                Cerrar Sesión
+                            </button>
+                        </form>
+                    </div>
                     @else
-                        <a href="/admin/login" class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4 border border-blue-800 transition-colors">
-                            Iniciar sesión
-                        </a>
+                    <a href="/admin/login" class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4 border border-blue-800 transition-colors">
+                        Iniciar sesión
+                    </a>
                     @endif
                 </div>
             </div>
@@ -63,9 +63,9 @@
                         Accede a los módulos disponibles del sistema de gestión de tickets para realizar tus actividades.
                     </p>
                     @if (!Auth::check())
-                        <p class="text-gray-600 text-sm">
-                            <a href="/admin/login" class="text-blue-700 hover:text-blue-800 font-semibold">Inicia sesión</a> para acceder a los módulos.
-                        </p>
+                    <p class="text-gray-600 text-sm">
+                        <a href="/admin/login" class="text-blue-700 hover:text-blue-800 font-semibold">Inicia sesión</a> para acceder a los módulos.
+                    </p>
                     @endif
                 </div>
             </div>
@@ -98,15 +98,15 @@
                                 </li>
                             </ul>
                             @if (Auth::check() && Auth::user()->can('Ver Modulo de Tickets'))
-                                <a href="{{ route('ticket-generator-get') }}" 
-                                   class="block w-full text-center bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4 border border-blue-800 transition-colors">
-                                    Acceder al Módulo
-                                </a>
+                            <a href="{{ route('ticket-generator-get') }}"
+                                class="block w-full text-center bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4 border border-blue-800 transition-colors">
+                                Acceder al Módulo
+                            </a>
                             @else
-                                <button disabled 
-                                        class="w-full bg-gray-400 text-gray-600 font-bold py-2 px-4 border border-gray-500 cursor-not-allowed">
-                                    Acceso Restringido
-                                </button>
+                            <button disabled
+                                class="w-full bg-gray-400 text-gray-600 font-bold py-2 px-4 border border-gray-500 cursor-not-allowed">
+                                Acceso Restringido
+                            </button>
                             @endif
                         </div>
                     </div>
@@ -134,8 +134,8 @@
                                     Selección de área a visualizar
                                 </li>
                             </ul>
-                            <a href="{{ route('tickets.screen') }}" 
-                               class="block w-full text-center bg-yellow-700 hover:bg-yellow-800 text-white font-bold py-2 px-4 border border-yellow-800 transition-colors">
+                            <a href="{{ route('tickets.screen') }}"
+                                class="block w-full text-center bg-yellow-700 hover:bg-yellow-800 text-white font-bold py-2 px-4 border border-yellow-800 transition-colors">
                                 Ver Pantalla
                             </a>
                         </div>
@@ -146,7 +146,7 @@
                         <div class="px-6 py-3 bg-green-700 border-b border-green-800">
                             <h3 class="text-lg font-bold text-white">Panel de Tickets</h3>
                         </div>
-                        <div class="p-6 space-y-4">
+                        <div class="p-6 space-y-4  ">
                             <p class="text-gray-700 text-sm">
                                 Panel de visualización y gestión de tickets para las áreas de atención.
                             </p>
@@ -165,15 +165,15 @@
                                 </li>
                             </ul>
                             @if (Auth::check() && Auth::user()->can('Ver Panel De Tickets'))
-                                <a href="{{ route('ticket-visualizer') }}" 
-                                   class="block w-full text-center bg-green-700 hover:bg-green-800 text-white font-bold py-2 px-4 border border-green-800 transition-colors">
-                                    Acceder al Panel
-                                </a>
+                            <a href="{{ route('ticket-visualizer') }}"
+                                class="block w-full text-center bg-green-700 hover:bg-green-800 text-white font-bold py-2 px-4 border border-green-800 transition-colors">
+                                Acceder al Panel
+                            </a>
                             @else
-                                <button disabled 
-                                        class="w-full bg-gray-400 text-gray-600 font-bold py-2 px-4 border border-gray-500 cursor-not-allowed">
-                                    Acceso Restringido
-                                </button>
+                            <button disabled
+                                class="w-full bg-gray-400 text-gray-600 font-bold py-2 px-4 border border-gray-500 cursor-not-allowed">
+                                Acceso Restringido
+                            </button>
                             @endif
                         </div>
                     </div>
@@ -202,15 +202,15 @@
                                 </li>
                             </ul>
                             @if (Auth::check() && Auth::user()->hasRole(config('filament-spatie-roles-permissions.super_admin_role_name', 'Super Admin')))
-                                <a href="/admin" 
-                                   class="block w-full text-center bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 border border-gray-800 transition-colors">
-                                    Ir al Panel
-                                </a>
+                            <a href="/admin"
+                                class="block w-full text-center bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 border border-gray-800 transition-colors">
+                                Ir al Panel
+                            </a>
                             @else
-                                <button disabled 
-                                        class="w-full bg-gray-400 text-gray-600 font-bold py-2 px-4 border border-gray-500 cursor-not-allowed">
-                                    Acceso Restringido
-                                </button>
+                            <button disabled
+                                class="w-full bg-gray-400 text-gray-600 font-bold py-2 px-4 border border-gray-500 cursor-not-allowed">
+                                Acceso Restringido
+                            </button>
                             @endif
                         </div>
                     </div>

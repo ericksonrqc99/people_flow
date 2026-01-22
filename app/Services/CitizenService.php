@@ -31,6 +31,13 @@ class CitizenService
 
     public function getCitizenByDni(int $dni): Citizen | null
     {
+        return Citizen::where('document_number', '=', $dni)
+            ->where('is_active', 1)
+            ->first();
+    }
+
+    public function getCitizenByDniIncludingInactive(int $dni): Citizen | null
+    {
         return Citizen::where('document_number', '=', $dni)->first();
     }
 }

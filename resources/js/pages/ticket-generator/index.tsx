@@ -70,6 +70,13 @@ export default function TicketGenerator({ areas }: props) {
                 (parentId ? area.parent_id === parentId : true),
         );
 
+    const quickAccessAreas = useMemo(() => {
+        const targets = new Set(['CGAT', 'VGAT']);
+        return areas
+            .filter((area) => targets.has(String(area.code).toUpperCase()))
+            .sort((a, b) => String(a.name).localeCompare(String(b.name), 'es'));
+    }, [areas]);
+
     function handleClickBackArrow(): void {
         switch (screen) {
             case 'search-citizen':
@@ -96,7 +103,9 @@ export default function TicketGenerator({ areas }: props) {
                 break;
             case 'confirm':
                 // Obtener el área seleccionada (la más profunda que tenga valor)
-                const selectedArea = selectedAreas.oficina.id
+                const selectedArea = data.area?.id
+                    ? data.area
+                    : selectedAreas.oficina.id
                     ? selectedAreas.oficina
                     : selectedAreas.unidad.id
                     ? selectedAreas.unidad
@@ -115,6 +124,13 @@ export default function TicketGenerator({ areas }: props) {
                 setSelectedAreas(initSelectedAreas);
                 break;
         }
+    };
+
+    const handleQuickSelect = (area: AreaT): void => {
+        if (!data.citizen.ok) return;
+
+        setData({ ...data, area });
+        setScreen('confirm');
     };
 
     const handleDisabledButton = (): boolean | undefined => {
@@ -175,7 +191,12 @@ export default function TicketGenerator({ areas }: props) {
                 {/* Contenido principal - Sin scroll */}
                 <div className="flex-1 overflow-hidden flex flex-col">
                     {screen === 'search-citizen' && (
-                        <FirstScreen data={data} setData={setData} />
+                        <FirstScreen
+                            data={data}
+                            setData={setData}
+                            quickAccessAreas={quickAccessAreas}
+                            onQuickCreate={handleQuickSelect}
+                        />
                     )}
                     {screen === 'areas' && (
                         <AreasScreen

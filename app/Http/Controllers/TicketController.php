@@ -63,6 +63,13 @@ class TicketController extends Controller
         try {
             //checks if the current user has an assigned area
             if (Auth::user()->area_id) {
+                $userArea = $this->areaService->getAreaById(Auth::user()->area_id);
+                if (! $userArea) {
+                    return Inertia::render('info/index', [
+                        'message' => __('Tu área está desactivada. Comunícate con el administrador del sistema.'),
+                    ]);
+                }
+
                 $currentUserId = Auth::id();
 
                 // Check if user has an active ticket assigned (status "atendiendo")
@@ -74,7 +81,7 @@ class TicketController extends Controller
                     $userHasActiveTicket = true;
                 } else {
                     // User doesn't have active tickets, show all area tickets
-                    $ticketsFind = $this->ticketService->getTicketsTodayByArea($this->areaService->getAreaById(Auth::user()->area_id));
+                    $ticketsFind = $this->ticketService->getTicketsTodayByArea($userArea);
                     $userHasActiveTicket = false;
                 }
 
@@ -283,6 +290,11 @@ class TicketController extends Controller
                     throw new \Exception('Failed area not found or deleted');
                 }
                 // Find or create citizen within transaction
+                $citizenRecord = $this->citizenService->getCitizenByDniIncludingInactive($reqCitizen['document_number']);
+                if ($citizenRecord && ! $citizenRecord->is_active) {
+                    throw new \Exception('Citizen inactive');
+                }
+
                 $citizen = $this->citizenService->getCitizenByDni($reqCitizen['document_number']);
 
                 if (!$citizen) {
@@ -348,6 +360,15 @@ class TicketController extends Controller
                     'request_data' => $request->all()
                 ]);
                 return Inertia::render('info/index', ['message' => __('No se pudo generar el código de ticket, por favor intente nuevamente.')]);
+            }
+            if ($e->getMessage() === 'Citizen inactive') {
+                Log::warning('Citizen inactive when creating ticket', [
+                    'message' => $e->getMessage(),
+                    'request_data' => $request->all(),
+                ]);
+                return Inertia::render('info/index', [
+                    'message' => __('El ciudadano está desactivado. Comunícate con el administrador del sistema.'),
+                ]);
             }
             if ($e->getMessage() === 'Failed to create citizen record') {
                 Log::error('Failed to create citizen record', [

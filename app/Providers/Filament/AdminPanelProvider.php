@@ -12,6 +12,7 @@ use App\Filament\Pages\Dashboard as AppDashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use App\Http\Middleware\EnsureUserIsActive;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -29,7 +30,7 @@ class AdminPanelProvider extends PanelProvider
             ->profile(isSimple: false)
             ->id('admin')
             ->path('admin')
-            ->login()
+            ->login(\App\Filament\Pages\Auth\Login::class)
             ->sidebarCollapsibleOnDesktop()
             ->colors([
                 'primary' => Color::Blue,
@@ -53,6 +54,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+                EnsureUserIsActive::class,
             ])->plugin(FilamentSpatieRolesPermissionsPlugin::make());
     }
 }

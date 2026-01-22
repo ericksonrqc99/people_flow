@@ -11,6 +11,7 @@ interface TicketPageHeaderProps {
     areaName?: string;
     voiceEnabled: boolean;
     onToggleVoice: () => void;
+    showVoiceToggle?: boolean;
 }
 
 export default function TicketPageHeader({
@@ -19,6 +20,7 @@ export default function TicketPageHeader({
     areaName,
     voiceEnabled,
     onToggleVoice,
+    showVoiceToggle = true,
 }: TicketPageHeaderProps) {
     const displayLabel = displayName?.trim() || userName;
     // Inicializar desde localStorage o true por defecto
@@ -108,17 +110,19 @@ export default function TicketPageHeader({
                         )}
                     </div>
                     <div className="flex items-center space-x-2">
-                        <button
-                            onClick={onToggleVoice}
-                            className="h-7 w-7 p-0 text-gray-600 hover:bg-gray-100 transition-colors text-xs flex items-center justify-center"
-                            title={voiceEnabled ? 'Silenciar voz' : 'Activar voz'}
-                        >
-                            {voiceEnabled ? (
-                                <Volume2 className="w-3 h-3" />
-                            ) : (
-                                <VolumeX className="w-3 h-3" />
-                            )}
-                        </button>
+                        {showVoiceToggle && (
+                            <button
+                                onClick={onToggleVoice}
+                                className="h-7 w-7 p-0 text-gray-600 hover:bg-gray-100 transition-colors text-xs flex items-center justify-center"
+                                title={voiceEnabled ? 'Silenciar voz' : 'Activar voz'}
+                            >
+                                {voiceEnabled ? (
+                                    <Volume2 className="w-3 h-3" />
+                                ) : (
+                                    <VolumeX className="w-3 h-3" />
+                                )}
+                            </button>
+                        )}
                         <button
                             onClick={() => setIsVisible(true)}
                             className="h-7 px-2 text-blue-700 hover:bg-blue-50 text-xs font-semibold transition-colors border border-blue-700"
@@ -198,17 +202,19 @@ export default function TicketPageHeader({
 
                             {/* Actions */}
                             <div className="flex items-center space-x-2 pl-3 border-l border-gray-300">
-                                <button
-                                    onClick={onToggleVoice}
-                                    className="h-7 w-7 p-0 text-gray-600 hover:bg-gray-100 transition-colors text-xs flex items-center justify-center"
-                                    title={voiceEnabled ? 'Silenciar voz' : 'Activar voz'}
-                                >
-                                    {voiceEnabled ? (
-                                        <Volume2 className="w-4 h-4" />
-                                    ) : (
-                                        <VolumeX className="w-4 h-4" />
-                                    )}
-                                </button>
+                                {showVoiceToggle && (
+                                    <button
+                                        onClick={onToggleVoice}
+                                        className="h-7 w-7 p-0 text-gray-600 hover:bg-gray-100 transition-colors text-xs flex items-center justify-center"
+                                        title={voiceEnabled ? 'Silenciar voz' : 'Activar voz'}
+                                    >
+                                        {voiceEnabled ? (
+                                            <Volume2 className="w-4 h-4" />
+                                        ) : (
+                                            <VolumeX className="w-4 h-4" />
+                                        )}
+                                    </button>
+                                )}
                                 <button
                                     onClick={() => setIsVisible(false)}
                                     className="h-7 w-7 p-0 text-gray-600 hover:bg-gray-100 transition-colors text-xs flex items-center justify-center"

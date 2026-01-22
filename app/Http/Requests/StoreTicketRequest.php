@@ -28,11 +28,16 @@ class StoreTicketRequest extends FormRequest
     {
         return [
             'area' => 'required|array',
+            'area.id' => [
+                'required',
+                'integer',
+                Rule::exists('areas', 'id')->where('is_active', 1),
+            ],
             'area.name' => 'required|string|max:100',
             'area.code' => 'required|string|max:100',
             'area.short_name' => 'required|string|max:100',
             'area.description' => 'nullable|string|max:255',
-            'area.is_active' => 'required|boolean',
+            'area.is_active' => 'required|accepted',
             'area.parent_id' => 'nullable|integer|exists:areas,id',
             'area.type_id' => ['nullable', 'integer', Rule::exists('types', 'id')->where('model', Area::class)],
 

@@ -2,15 +2,21 @@ import { TicketGeneratorFormDataT } from '../types';
 import { searchCitizenByDni } from '@/services/citizen';
 import { capitalizeFirstLetter } from '@/lib/utils';
 import { useState } from 'react';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AreaT } from '@/types/general';
 
 type props = {
     setData: (value: TicketGeneratorFormDataT) => void;
     data: TicketGeneratorFormDataT;
+    quickAccessAreas: AreaT[];
+    onQuickCreate: (area: AreaT) => void;
 };
 
-export default function FirstScreen({ setData, data }: props) {
+export default function FirstScreen({ setData, data, quickAccessAreas, onQuickCreate }: props) {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState('');
+    const [isQuickAccessOpen, setIsQuickAccessOpen] = useState(false);
+    const isInactiveCitizen = error.toLowerCase().includes('desactivado');
 
     const handleOnChangeInput = async (
         e: React.ChangeEvent<HTMLInputElement>,
@@ -38,6 +44,14 @@ export default function FirstScreen({ setData, data }: props) {
                     setData({ ...data, citizen: { ...response } });
                     return;
                 }
+                setData({
+                    ...data,
+                    citizen: {
+                        ...data.citizen,
+                        ok: false,
+                        document_number: value,
+                    },
+                });
                 setError(response.message);
             } catch (error) {
                 setIsLoading(false);
@@ -79,6 +93,21 @@ export default function FirstScreen({ setData, data }: props) {
                         />
                     </div>
 
+                    {/* Quick Access */}
+                    {data.citizen.ok && quickAccessAreas.length > 0 && (
+                        <div className="mb-4 sm:mb-6 bg-gray-50 border border-gray-300 p-3 sm:p-4">
+                            <p className="text-xs sm:text-sm font-semibold text-gray-700 mb-2">
+                                Accesos rápidos
+                            </p>
+                            <button
+                                onClick={() => setIsQuickAccessOpen(true)}
+                                className="inline-flex items-center px-6 py-3 bg-yellow-700 text-white text-md font-bold border border-yellow-800 hover:bg-yellow-800 transition-colors"
+                            >
+                                GAT
+                            </button>
+                        </div>
+                    )}
+
                     {/* Status messages */}
                     <div className="min-h-20 sm:min-h-24 flex items-center justify-center">
                         {isLoading ? (
@@ -103,16 +132,56 @@ export default function FirstScreen({ setData, data }: props) {
                             </div>
                         ) : (
                             error && (
-                                <div className="text-center p-3 sm:p-4 bg-gray-50 border border-red-400 w-full">
+                                <div className={`text-center p-3 sm:p-4 w-full ${
+                                    isInactiveCitizen
+                                        ? 'bg-red-50 border border-red-500'
+                                        : 'bg-gray-50 border border-red-400'
+                                }`}>
                                     <p className="text-sm sm:text-base text-red-700 font-semibold">
                                         ⚠ {error}
                                     </p>
+                                    {isInactiveCitizen && (
+                                        <p className="text-xs sm:text-sm text-red-600 mt-2">
+                                            No se puede generar ticket para este ciudadano.
+                                        </p>
+                                    )}
                                 </div>
                             )
                         )}
                     </div>
                 </div>
             </div>
+
+            <Dialog open={isQuickAccessOpen} onOpenChange={setIsQuickAccessOpen}>
+                <DialogContent className="max-w-md border border-gray-300 rounded-none shadow-none">
+                    <DialogHeader>
+                        <DialogTitle>Accesos rápidos - GAT</DialogTitle>
+                        
+                    </DialogHeader>
+                    <div className="grid grid-cols-1 gap-2 py-2">
+                        {quickAccessAreas.map((area) => (
+                            <button
+                                key={area.id}
+                                onClick={() => {
+                                    onQuickCreate(area);
+                                    setIsQuickAccessOpen(false);
+                                }}
+                                className="w-full px-6 py-3 text-md font-bold border border-gray-300 bg-white hover:bg-gray-50 text-gray-900"
+                            >
+                                {area.name}
+                            </button>
+                        ))}
+                    </div>
+                    <DialogFooter>
+                        <button
+                            onClick={() => setIsQuickAccessOpen(false)}
+                            className="px-3 py-2 text-sm font-semibold bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200"
+                        >
+                            Cerrar
+                        </button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
