@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureInternetConnection;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\EnsureUserIsActive;
 use App\Http\Middleware\NoCacheMiddleware;
@@ -13,11 +14,16 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__ . '/../routes/console.php',
         health: '/up',
     )->withMiddleware(function (Middleware $middleware) {
-        $middleware->web(append: [
-            HandleInertiaRequests::class,
-            EnsureUserIsActive::class,
-        ]);
-        
+        $middleware->web(
+            prepend: [
+                EnsureInternetConnection::class,
+            ],
+            append: [
+                HandleInertiaRequests::class,
+                EnsureUserIsActive::class,
+            ]
+        );
+
         // Registrar middleware personalizado
         $middleware->alias([
             'no-cache' => NoCacheMiddleware::class,
