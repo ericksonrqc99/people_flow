@@ -7,7 +7,9 @@
 
 *be at the root of the project*  
 
+# IMPORTANT
 
+*complete the required data in the **.env.example** file before creating the **.env** file*
 
 
 ## 1. Create .env
