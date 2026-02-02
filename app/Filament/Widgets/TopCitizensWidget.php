@@ -3,25 +3,24 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Citizen;
-use App\Models\Ticket;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
-use Illuminate\Support\Facades\DB;
 
 class TopCitizensWidget extends BaseWidget
 {
     protected static ?string $heading = 'Top 10 Ciudadanos Más Activos';
-    
+
     protected static ?int $sort = 20;
-    
-    protected int | string | array $columnSpan = 'full';
+
+    protected int|string|array $columnSpan = 'full';
 
     public function table(Table $table): Table
     {
         return $table
             ->query(
                 Citizen::withCount('tickets')
+                    ->with(['tickets' => fn ($q) => $q->latest()->limit(1)])
                     ->whereHas('tickets')
                     ->orderByDesc('tickets_count')
                     ->limit(10)
@@ -30,7 +29,7 @@ class TopCitizensWidget extends BaseWidget
                 Tables\Columns\TextColumn::make('position')
                     ->label('#')
                     ->getStateUsing(function ($record, $rowLoop): string {
-                        return '#' . ($rowLoop->index + 1);
+                        return '#'.($rowLoop->index + 1);
                     })
                     ->badge()
                     ->color(fn ($record, $rowLoop): string => match ($rowLoop->index) {
@@ -60,7 +59,8 @@ class TopCitizensWidget extends BaseWidget
                 Tables\Columns\TextColumn::make('tickets.last.created_at')
                     ->label('Último Ticket')
                     ->getStateUsing(function ($record) {
-                        $lastTicket = $record->tickets()->latest()->first();
+                        $lastTicket = $record->tickets->first();
+
                         return $lastTicket?->created_at;
                     })
                     ->since()
@@ -68,6 +68,7 @@ class TopCitizensWidget extends BaseWidget
                     ->icon('heroicon-m-clock')
                     ->color('gray'),
             ])
+            ->searchable()
             ->paginated([10, 25, 50])
             ->paginationPageOptions([10, 25, 50])
             ->emptyStateHeading('Sin datos de ciudadanos')

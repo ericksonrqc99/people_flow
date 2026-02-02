@@ -1,14 +1,17 @@
-1.- Mejorar los gráficos y en general el dashboard, para que se muestre los datos correctamente 
-a lo largo del tiempo
+TODO LIST - People Flow Project
+================================
 
-2.- Que solo muestre los permisos y dashboard a los que tengan los permisos, 
-ahora mismo se muestra permisos, roles, dashboard para todos los usuarios
+ALTA PRIORIDAD:
+[ ] Dashboard mejorado - Optimizar gráficos para mostrar datos temporales correctamente
+[ ] Control de permisos - Implementar acceso basado en roles para dashboard, permisos y roles  
+[ ] Sistema de logs - Agregar registro de movimientos de recursos
 
-3.- Mejorar los archivos .env
+PRIORIDAD MEDIA:
+[ ] Homepage - Crear página principal con navegación de rutas disponibles
+[ ] Logout - Implementar sistema de cierre de sesión para usuarios del módulo
+[ ] Configuración .env - Mejorar y documentar variables de entorno
 
-4.- Hacer una pantalla de Home page donde se muestre todas las rutas disponibles
-
-5.- Agregar alguna forma de cerrar sesión de los usuario de modulo
-
-
-6.- Agregar logs para el movimiento de los recursos
+NOTAS:
+- Revisar dependencias de gráficos (Chart.js, etc.)
+- Evaluar middleware para control de permisos
+- Considerar sistema de auditoría para logs
