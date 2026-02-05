@@ -19,15 +19,25 @@
 
 *fill in required fields*
 
-## 2. Install dependencies 
+## 2. Install composer dependencies 
 
+***php** and **composer** install required*
 ~~~
-composer install && bun install
+composer install 
 ~~~
-   
+
+## 2. Install js dependencies 
+*JavaScript package manager required* (recommended **bun**)
+~~~
+bun install 
+~~~
+## 3. Generate App Key
+~~~
+php artisan key:generate 
+~~~
 ## 3. Run migrations and seeders
 ~~~
-php artisan migrate --seed
+sudo ./vendor/bin/sail php artisan migrate --seed
 ~~~
 
 ## 4. Generate permissions 

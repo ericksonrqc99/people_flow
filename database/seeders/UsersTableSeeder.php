@@ -11,12 +11,12 @@ class UsersTableSeeder extends Seeder
     public function run(): void
     {
 
-        $hashedPassword = Hash::make(env('SUPER_ADMIN_PASSWORD', 'admin1234'));
+        $hashedPassword = Hash::make(env('SUPER_ADMIN_PASSWORD', 'supersecretpassword'));
 
         DB::table('users')->insert([
             'name' => 'Super Admin',
             'display_name' => 'Super Admin',
-            'email' => env('SUPER_ADMIN_EMAIL', 'admin@admin.com'),
+            'email' => env('SUPER_ADMIN_EMAIL', 'superadmin@admin.com'),
             'password' => $hashedPassword,
         ]);
     }
