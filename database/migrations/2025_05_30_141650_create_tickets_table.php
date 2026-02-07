@@ -17,8 +17,13 @@ return new class extends Migration
             $table->string('visible_code',  100);
             $table->foreignId('area_id')->constrained('areas')->onDelete('restrict');
             $table->foreignId('citizen_id')->constrained('citizens')->onDelete('restrict');
-            $table->foreignId('registered_by')->constrained('users')->onDelete('restrict');
-            $table->foreignId('attended_by')->nullable()->constrained('users')->onDelete('restrict');
+            $table->foreignId('registered_by_id')->constrained('users')->onDelete('restrict');
+            $table->foreignId('attended_by_id')->nullable()->constrained('users')->onDelete('restrict');
+            $table->unsignedBigInteger('status_id')->default(5); // value of the “waiting” status ID, which is 5 generated from the seeders
+            $table->foreign('status_id')
+                ->references('id')
+                ->on('types')
+                ->onDelete('cascade');
             $table->timestamp("time_admission")->nullable();
             $table->timestamp("time_departure")->nullable();
             $table->text('observations')->nullable();

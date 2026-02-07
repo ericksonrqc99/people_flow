@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Citizen;
 use App\Services\ApiReniecService;
 use App\Services\FactilizaApiService;
 use Illuminate\Http\Request;
@@ -15,6 +16,14 @@ class CitizenController extends Controller
     public function getCitizenByDni(int $dni)
     {
         try {
+            $citizenRecord = Citizen::where('document_number', $dni)->first();
+            if ($citizenRecord && ! $citizenRecord->is_active) {
+                return response()->json([
+                    'ok' => false,
+                    'message' => 'El ciudadano está desactivado. Comunícate con el administrador del sistema.',
+                ], 200);
+            }
+
             // $citizenFound = $this->apiReniecService->getDataByDni($dni);
 
             $citizenFoundRaw = $this->factilizaApiService->getDataCitizenByDni($dni);

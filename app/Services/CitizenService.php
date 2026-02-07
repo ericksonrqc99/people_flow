@@ -11,7 +11,7 @@ class CitizenService
     {
 
         $newCitizen = Citizen::create((new CitizenData(
-            $document_number = $citizen['dni'],
+            $document_number = $citizen['document_number'],
             $names = $citizen['names'],
             $first_surname = $citizen['first_surname'],
             $second_surname = $citizen['second_surname'],
@@ -29,7 +29,14 @@ class CitizenService
         return Citizen::where('document_number', $dni)->exists();
     }
 
-    public function getCitizenByDni(int $dni): Citizen
+    public function getCitizenByDni(int $dni): Citizen | null
+    {
+        return Citizen::where('document_number', '=', $dni)
+            ->where('is_active', 1)
+            ->first();
+    }
+
+    public function getCitizenByDniIncludingInactive(int $dni): Citizen | null
     {
         return Citizen::where('document_number', '=', $dni)->first();
     }

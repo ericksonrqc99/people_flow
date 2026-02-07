@@ -78,10 +78,14 @@ export default function BoxContent({
         <div
             onClick={handleOnClick}
             onDoubleClick={handleOnDoubleClick}
-            className={`bg-custom-muted px-2 min-h-40  py-4 flex items-center justify-center rounded-md hover:bg-custom-200 cursor-pointer border-4  border-transparent ${className} shadow-lg ${setStyles() && 'border-4 border-dashed !border-black'}`}
+            className={`p-4 min-h-32 flex items-center justify-center transition-all cursor-pointer border ${
+                setStyles()
+                    ? 'bg-blue-700 text-white border-blue-800'
+                    : 'bg-white text-gray-700 border-gray-300 hover:border-blue-500'
+            }`}
         >
-            <h3 className="text-center font-semibold">
-                {capitalizeFirstLetterOnly(area.short_name)}
+            <h3 className="text-center font-semibold text-lg">
+                {area.short_name}
             </h3>
         </div>
     );

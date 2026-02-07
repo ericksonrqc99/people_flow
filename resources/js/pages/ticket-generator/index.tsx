@@ -4,7 +4,7 @@ import AreasScreen from './components/areas-screen';
 import ConfirmScreen from './components/confirm-screen';
 import { TicketGeneratorFormDataT } from './types';
 import { MoveLeft } from 'lucide-react';
-import { AreaT, CitizenResponseT, CitizenT } from '@/types/general';
+import { AreaT, CitizenT } from '@/types/general';
 import { useMemo, useState } from 'react';
 import { useForm } from '@inertiajs/react';
 
@@ -12,13 +12,7 @@ type props = {
     areas: AreaT[];
 };
 
-export type ScreenT =
-    | 'search-citizen'
-    | 'gerencias'
-    | 'subgerencias'
-    | 'oficinas'
-    | 'unidades'
-    | 'confirm';
+export type ScreenT = 'search-citizen' | 'areas' | 'confirm';
 
 const initArea: AreaT = {
     id: '',
@@ -38,7 +32,7 @@ const initData: { citizen: CitizenT; area: AreaT } = {
         names: '',
         first_surname: '',
         second_surname: '',
-        dni: '',
+        document_number: '',
         address: '',
         departamet: '',
         district: '',
@@ -60,6 +54,8 @@ export default function TicketGenerator({ areas }: props) {
     const { data, setData, post } =
         useForm<Required<TicketGeneratorFormDataT>>(initData);
 
+    const [ticketData, setTicketData] = useState<any>(null);
+
     const [selectedAreas, setSelectedAreas] = useState<{
         gerencia: AreaT;
         subgerencia: AreaT;
@@ -74,38 +70,23 @@ export default function TicketGenerator({ areas }: props) {
                 (parentId ? area.parent_id === parentId : true),
         );
 
-    const gerencias = useMemo(() => getAreasByType(1), []);
-    const subGerencias = useMemo(
-        () => getAreasByType(2, selectedAreas.gerencia.id),
-        [selectedAreas.gerencia],
-    );
-    const unidades = useMemo(
-        () => getAreasByType(3, selectedAreas.subgerencia.id),
-        [selectedAreas.subgerencia],
-    );
-    const oficinas = useMemo(() => getAreasByType(4), []);
+    const quickAccessAreas = useMemo(() => {
+        const targets = new Set(['CGAT', 'VGAT']);
+        return areas
+            .filter((area) => targets.has(String(area.code).toUpperCase()))
+            .sort((a, b) => String(a.name).localeCompare(String(b.name), 'es'));
+    }, [areas]);
 
     function handleClickBackArrow(): void {
         switch (screen) {
-            case 'gerencias':
+            case 'search-citizen':
+                break;
+            case 'areas':
                 setScreen('search-citizen');
-                setSelectedAreas({ ...selectedAreas, gerencia: initArea });
-                break;
-            case 'subgerencias':
-                setScreen('gerencias');
-                setSelectedAreas({ ...selectedAreas, subgerencia: initArea });
-                break;
-            case 'unidades':
-                setScreen('subgerencias');
-                setSelectedAreas({ ...selectedAreas, unidad: initArea });
-                break;
-            case 'oficinas':
-                setScreen('gerencias');
-                setSelectedAreas({ ...selectedAreas, oficina: initArea });
+                setSelectedAreas(initSelectedAreas);
                 break;
             case 'confirm':
-                setScreen('gerencias');
-                setSelectedAreas({ ...selectedAreas, oficina: initArea });
+                setScreen('areas');
                 break;
             default:
                 break;
@@ -115,27 +96,28 @@ export default function TicketGenerator({ areas }: props) {
     const handleOnClickButton = (): void => {
         switch (screen) {
             case 'search-citizen':
-                setScreen('gerencias');
+                setScreen('areas');
                 break;
-            case 'gerencias':
-                setData({ ...data, area: selectedAreas.gerencia });
-                setScreen('confirm');
-                break;
-            case 'subgerencias':
-                setData({ ...data, area: selectedAreas.subgerencia });
-                setScreen('confirm');
-                break;
-            case 'unidades':
-                setData({ ...data, area: selectedAreas.unidad });
-                setScreen('confirm');
-                break;
-            case 'oficinas':
-                setData({ ...data, area: selectedAreas.oficina });
-                setScreen('confirm');
+            case 'areas':
+                // La selección de área es manejada por AreasScreen
                 break;
             case 'confirm':
+                // Obtener el área seleccionada (la más profunda que tenga valor)
+                const selectedArea = data.area?.id
+                    ? data.area
+                    : selectedAreas.oficina.id
+                    ? selectedAreas.oficina
+                    : selectedAreas.unidad.id
+                    ? selectedAreas.unidad
+                    : selectedAreas.subgerencia.id
+                    ? selectedAreas.subgerencia
+                    : selectedAreas.gerencia;
+                
+                setData({ ...data, area: selectedArea });
                 post(route('ticket-generator.store'), {
-                    onSuccess: () => {},
+                    onSuccess: (data) => {
+                        setTicketData(data.props.ticketGenerated);
+                    },
                 });
                 setScreen('search-citizen');
                 setData(initData);
@@ -144,103 +126,105 @@ export default function TicketGenerator({ areas }: props) {
         }
     };
 
+    const handleQuickSelect = (area: AreaT): void => {
+        if (!data.citizen.ok) return;
+
+        setData({ ...data, area });
+        setScreen('confirm');
+    };
+
     const handleDisabledButton = (): boolean | undefined => {
         switch (screen) {
             case 'search-citizen':
                 return !data.citizen.ok;
-            case 'gerencias':
-                return selectedAreas.gerencia.id === '';
-            case 'oficinas':
-                return selectedAreas.oficina.id === '';
-            case 'subgerencias':
-                return selectedAreas.subgerencia.id === '';
-            case 'unidades':
-                return selectedAreas.unidad.id === '';
+            case 'areas':
+                return false; // Los botones están en AreasScreen
+            case 'confirm':
+                return false;
+            default:
+                return true;
+        }
+    };
+
+    const getButtonText = (): string => {
+        switch (screen) {
+            case 'search-citizen':
+                return 'Continuar';
+            case 'areas':
+                return 'Seleccionar';
+            case 'confirm':
+                return 'Generar Ticket';
+            default:
+                return 'Continuar';
         }
     };
 
     return (
         <GuestLayout className="font-inter">
-            <div className="bg-custom-background w-full h-full p-4 select-none">
-                {/* back screen button*/}
-                {screen !== 'search-citizen' ? (
-                    <div className="flex text-cust h-1/15 justify-between items-center">
-                        <div
-                            className=" h-full flex items-center bg-custom-foreground text-custom-button-text rounded-md"
-                            onClick={handleClickBackArrow}
-                        >
-                            <MoveLeft
-                                size={70}
-                                className="cursor-pointer p-2"
-                            />
-                        </div>
+            <div className="bg-slate-50 w-full h-screen p-3 sm:p-4 md:p-6 select-none flex flex-col">
+                {/* Header AdminLTE style - Compacto */}
+                <div className="mb-3 sm:mb-4 flex items-center justify-between flex-shrink-0">
+                    <div className="flex items-center gap-2 sm:gap-3">
+                        <img
+                            src="/assets/images/escudo-muni.png"
+                            alt="Logo"
+                            className="h-8 sm:h-10 md:h-12 w-8 sm:w-10 md:w-12"
+                        />
+                        <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800">
+                            Generador de Tickets
+                        </h2>
                     </div>
-                ) : (
-                    <div className="h-1/15"></div>
+                </div>
+
+                {/* Botón de Atrás - Fijo en la parte superior derecha */}
+                {screen !== 'areas' && screen !== 'search-citizen' && (
+                    <div className="flex justify-end flex-shrink-0 mb-2">
+                        <button
+                            onClick={handleClickBackArrow}
+                            className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1.5 transition-colors text-xs font-semibold"
+                        >
+                            ← Atrás
+                        </button>
+                    </div>
                 )}
 
-                {/* render screen */}
-                <div className="h-12/15 w-full">
+                {/* Contenido principal - Sin scroll */}
+                <div className="flex-1 overflow-hidden flex flex-col">
                     {screen === 'search-citizen' && (
-                        <FirstScreen data={data} setData={setData} />
-                    )}
-                    {screen === 'gerencias' && (
-                        <AreasScreen
-                            areas={gerencias}
-                            setScreen={setScreen}
-                            screen={screen}
-                            setSelectedAreas={setSelectedAreas}
-                            selectedAreas={selectedAreas}
-                            title="Gerencias"
+                        <FirstScreen
+                            data={data}
+                            setData={setData}
+                            quickAccessAreas={quickAccessAreas}
+                            onQuickCreate={handleQuickSelect}
                         />
                     )}
-                    {screen === 'subgerencias' && (
+                    {screen === 'areas' && (
                         <AreasScreen
-                            areas={subGerencias}
+                            areas={areas}
                             setScreen={setScreen}
                             screen={screen}
                             setSelectedAreas={setSelectedAreas}
                             selectedAreas={selectedAreas}
-                            title="Sub Gerencias"
-                        />
-                    )}
-                    {screen === 'unidades' && (
-                        <AreasScreen
-                            areas={unidades}
-                            setScreen={setScreen}
-                            screen={screen}
-                            setSelectedAreas={setSelectedAreas}
-                            selectedAreas={selectedAreas}
-                            title="Unidades"
-                        />
-                    )}
-                    {screen === 'oficinas' && (
-                        <AreasScreen
-                            areas={oficinas}
-                            setScreen={setScreen}
-                            screen={screen}
-                            setSelectedAreas={setSelectedAreas}
-                            selectedAreas={selectedAreas}
-                            title="Oficinas"
+                            title="Seleccionar Área"
+                            setData={setData}
+                            data={data}
                         />
                     )}
                     {screen === 'confirm' && <ConfirmScreen data={data} />}
                 </div>
-                {/* render screen */}
 
-                <div className="h-2/15 flex justify-center">
-                    <button
-                        disabled={handleDisabledButton()}
-                        onClick={handleOnClickButton}
-                        className="bg-custom-foreground  rounded-md text-custom-button-text font-bold h-14 cursor-pointer text-2xl shadow-xl shadow-custom-700 w-1/2"
-                    >
-                        {screen === 'search-citizen'
-                            ? 'Continuar'
-                            : screen === 'confirm'
-                              ? 'Generar Ticket'
-                              : 'Seleccionar'}
-                    </button>
-                </div>
+                {/* Botones de acción - Fijos en la parte inferior */}
+                {screen !== 'areas' && (
+                    <div className="flex justify-center gap-2 sm:gap-4 mt-3 sm:mt-4 flex-shrink-0 flex-wrap">
+                        <button
+                            disabled={handleDisabledButton()}
+                            onClick={handleOnClickButton}
+                            className="bg-gray-800 hover:bg-gray-900 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold h-10 sm:h-12 cursor-pointer text-sm sm:text-base transition-colors px-4 sm:px-6 border border-gray-900 disabled:border-gray-500"
+                        >
+                            {getButtonText()}
+                        </button>
+                    </div>
+                )}
             </div>
         </GuestLayout>
     );

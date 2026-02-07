@@ -1,2 +1,14 @@
-TODO:: agregar soporte para fallos de api
-TODO:: do not allow deleting superadmin
+1.- Mejorar los gráficos y en general el dashboard, para que se muestre los datos correctamente 
+a lo largo del tiempo
+
+2.- Que solo muestre los permisos y dashboard a los que tengan los permisos, 
+ahora mismo se muestra permisos, roles, dashboard para todos los usuarios
+
+3.- Mejorar los archivos .env
+
+4.- Hacer una pantalla de Home page donde se muestre todas las rutas disponibles
+
+5.- Agregar alguna forma de cerrar sesión de los usuario de modulo
+
+
+6.- Agregar logs para el movimiento de los recursos

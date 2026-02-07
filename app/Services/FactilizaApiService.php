@@ -76,7 +76,7 @@ class FactilizaApiService
     public static function mapCitizen(array $citizenRaw): array
     {
         $newCitizen = [];
-        $newCitizen['dni'] = trim($citizenRaw['numero']);
+        $newCitizen['document_number'] = trim($citizenRaw['numero']);
         $newCitizen['names'] = trim($citizenRaw['nombres']);
         $newCitizen['first_surname'] = trim($citizenRaw['apellido_paterno']);
         $newCitizen['second_surname'] = trim($citizenRaw['apellido_materno']);

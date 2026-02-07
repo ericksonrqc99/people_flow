@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\EnsureUserIsActive;
+use App\Http\Middleware\NoCacheMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -13,6 +15,12 @@ return Application::configure(basePath: dirname(__DIR__))
     )->withMiddleware(function (Middleware $middleware) {
         $middleware->web(append: [
             HandleInertiaRequests::class,
+            EnsureUserIsActive::class,
+        ]);
+        
+        // Registrar middleware personalizado
+        $middleware->alias([
+            'no-cache' => NoCacheMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

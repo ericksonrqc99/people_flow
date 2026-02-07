@@ -18,54 +18,104 @@ class TokenResource extends Resource
 {
     protected static ?string $model = Token::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-key';
+
+    protected static ?string $navigationLabel = 'Tokens';
+
+    protected static ?string $navigationGroup = 'Sistema';
+
+    protected static ?string $modelLabel = 'Token';
+
+    protected static ?string $pluralModelLabel = 'Tokens';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Toggle::make('is_active')
-                    ->label(__('Estado'))
-                    ->onColor('success')
-                    ->offColor('danger')
-                    ->onIcon('heroicon-o-check')
-                    ->offIcon('heroicon-o-x-mark')
-                    ->default(true)
-                    ->columnSpanFull(),
-                Forms\Components\Fieldset::make('')->schema([
-                    Forms\Components\TextInput::make('access_token')
-                        ->required()
-                        ->label(__('Token de acceso'))
-                        ->columnSpanFull(),
-                    Forms\Components\TextInput::make('service')
-                        ->label(__('Servicio'))
-                        ->columnSpanFull()
-                        ->required()
-                        ->maxLength(100),
-                ])
-            ]);
+                Forms\Components\Section::make('Estado del Token')
+                    ->schema([
+                        Forms\Components\Toggle::make('is_active')
+                            ->label(__('Estado'))
+                            ->onColor('success')
+                            ->offColor('danger')
+                            ->onIcon('heroicon-o-check')
+                            ->offIcon('heroicon-o-x-mark')
+                            ->default(true)
+                            ->columnSpanFull(),
+                    ])
+                    ->collapsible(),
+
+                Forms\Components\Fieldset::make('Datos del Token')
+                    ->columns(1)
+                    ->schema([
+                        Forms\Components\TextInput::make('access_token')
+                            ->label(__('Token de Acceso'))
+                            ->required()
+                            ->placeholder('Ingresa el token de acceso')
+                            ->helperText('Token dado por el servicio externo para autenticación')
+                            ->columnSpanFull(),
+                        Forms\Components\TextInput::make('service')
+                            ->label(__('Servicio'))
+                            ->required()
+                            ->maxLength(100)
+                            ->placeholder('Nombre del servicio asociado')
+                            ->helperText('Nombre o identificador único del servicio que utiliza este token')
+                            ->columnSpanFull(),
+                    ]),
+            ])
+            ->columns(1);
     }
 
     public static function table(Table $table): Table
     {
         return $table
+            ->paginationPageOptions([5, 20, 50, 100])
+            ->deferLoading()
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('id')
-                    ->label(__('ID')),
-                Tables\Columns\IconColumn::make('is_active')
-                    ->label(__('Estado'))
-                    ->boolean(),
-                Tables\Columns\TextColumn::make('access_token')
-                    ->label('Token')
-                    ->limit(50),
+                    ->label(__('ID'))
+                    ->badge()
+                    ->color('gray')
+                    ->icon('heroicon-m-hashtag')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('service')
                     ->label(__('Servicio'))
-                    ->searchable(),
+                    ->badge()
+                    ->color('info')
+                    ->icon('heroicon-m-cog-6-tooth')
+                    ->searchable()
+                    ->sortable()
+                    ->weight('bold'),
+                Tables\Columns\TextColumn::make('access_token')
+                    ->label(__('Token'))
+                    ->badge()
+                    ->color('primary')
+                    ->icon('heroicon-m-key')
+                    ->limit(40)
+                    ->searchable()
+                    ->copyable()
+                    ->copyableState(fn ($state) => $state),
+                Tables\Columns\TextColumn::make('is_active')
+                    ->label(__('Estado'))
+                    ->badge()
+                    ->color(fn(int $state): string => match ($state) {
+                        0 => 'danger',
+                        1 => 'success'
+                    })
+                    ->formatStateUsing(fn(int $state): string => match ($state) {
+                        0 => 'inactivo',
+                        1 => 'activo'
+                    })
+                    ->icon(fn(int $state): string => $state ? 'heroicon-m-check-circle' : 'heroicon-m-x-circle')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('Creado'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
+                    ->label(__('Actualizado'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
