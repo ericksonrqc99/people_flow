@@ -60,7 +60,7 @@ class CitizenResource extends Resource
                             ->label(__('DNI'))
                             ->required()
                             ->unique(ignoreRecord: true)
-                            ->validationMessages(['unique' => 'El DNI ya está siendo usado'])
+                            ->maxLength(8)
                             ->placeholder('Ingresa el DNI del ciudadano')
                             ->helperText('Identificación única del ciudadano')
                             ->suffixActions([
@@ -78,7 +78,16 @@ class CitizenResource extends Resource
                                             Notification::make()
                                                 ->warning()
                                                 ->title('DNI inválido')
-                                                ->body('El dni debe contener 8 dígitos')
+                                                ->body('El dni debe contener solo 8 dígitos')
+                                                ->send();
+                                            return;
+                                        }
+                                        $citizenExists = Citizen::where('document_number', $state)->exists();
+                                        if ($citizenExists) {
+                                            Notification::make()
+                                                ->warning()
+                                                ->title('DNI duplicado')
+                                                ->body('El DNI ingresado ya está registrado')
                                                 ->send();
                                             return;
                                         }
@@ -123,8 +132,7 @@ class CitizenResource extends Resource
                             ->live()
                             ->numeric()
                             ->columnSpan(3)
-                            ->hidden(fn(string $operation) => $operation === 'edit'),
-                    ]),
+                    ])->hidden(fn(string $operation): bool => $operation === 'edit'),
 
                 Forms\Components\Fieldset::make(__('Datos Personales'))
                     ->columns(2)
