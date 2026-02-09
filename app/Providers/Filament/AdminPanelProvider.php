@@ -7,12 +7,16 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\MenuItem;
+use Filament\Navigation\NavigationItem;
 use Filament\Pages;
 use App\Filament\Pages\Dashboard as AppDashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use App\Http\Middleware\EnsureUserIsActive;
+use App\Http\Middleware\EnsureUserHasPermission;
+use Filament\Support\Enums\MaxWidth;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -55,6 +59,16 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
                 EnsureUserIsActive::class,
-            ])->plugin(FilamentSpatieRolesPermissionsPlugin::make());
+                EnsureUserHasPermission::class,
+            ])
+            ->plugin(FilamentSpatieRolesPermissionsPlugin::make())
+            ->navigationItems([
+                NavigationItem::make('Inicio')
+                    ->url('/')
+                    ->icon('heroicon-o-home')
+                    ->sort(-2),
+            ])
+            ->unsavedChangesAlerts()
+        ;
     }
 }

@@ -25,22 +25,31 @@
                         <p class="text-gray-300 text-sm mt-1">Municipalidad de San Miguel - San Román</p>
                     </div>
                     @if (Auth::check())
-                    <div class="flex items-center gap-4 bg-gray-800 px-4 py-3 rounded border border-gray-600">
-                        <div class="text-right">
-                            <p class="text-sm font-semibold">{{ Auth::user()->name }}</p>
-                            @if (Auth::user()->area)
-                            <p class="text-xs text-gray-300">{{ Auth::user()->area->name }}</p>
-                            @endif
+                    <div class="flex flex-col items-center gap-4 bg-gray-800 px-4 py-3 rounded border border-gray-600">
+                        <div class='flex gap-x-6 items-center'>
+                            <div class="text-right">
+                                <p class="text-sm font-semibold">{{ Auth::user()->name }}</p>
+                                @if (Auth::user()->area)
+                                <p class="text-xs text-gray-300">{{ Auth::user()->area->name }}</p>
+                                @endif
+                            </div>
+                            <div class="w-10 h-10 bg-blue-700 flex items-center justify-center font-bold rounded">
+                                {{ substr(Auth::user()->name, 0, 1) }}
+                            </div>
+
+                            <form action="{{ route('logout') }}" method="POST">
+                                @csrf
+                                <button type="submit" class="bg-red-700 hover:bg-red-800 text-white font-bold py-1 px-3 text-sm border border-red-800 transition-colors">
+                                    Cerrar Sesión
+                                </button>
+                            </form>
                         </div>
-                        <div class="w-10 h-10 bg-blue-700 flex items-center justify-center font-bold rounded">
-                            {{ substr(Auth::user()->name, 0, 1) }}
-                        </div>
-                        <form action="{{ route('logout') }}" method="POST">
-                            @csrf
-                            <button type="submit" class="bg-red-700 hover:bg-red-800 text-white font-bold py-1 px-3 text-sm border border-red-800 transition-colors">
-                                Cerrar Sesión
-                            </button>
-                        </form>
+                        @if (Auth::check() && (Auth::user()->hasRole(config('filament-spatie-roles-permissions.super_admin_role_name', 'Super Admin')) || Auth::user()->can('Ver Panel Administrativo')))
+                        <a href="/admin"
+                            class="block w-full text-center bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 border border-gray-800 transition-colors">
+                            Panel de administración
+                        </a>
+                        @endif
                     </div>
                     @else
                     <a href="/admin/login" class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4 border border-blue-800 transition-colors">
@@ -73,7 +82,7 @@
             <!-- Módulos Disponibles -->
             <div>
                 <h2 class="text-2xl font-bold text-gray-900 mb-6">Módulos Disponibles</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="flex flex-row gap-x-6">
                     <!-- Módulo de Generación de Tickets -->
                     <div class="bg-white border border-gray-300 shadow hover:shadow-lg transition-shadow">
                         <div class="px-6 py-3 bg-blue-700 border-b border-blue-800">
@@ -168,43 +177,6 @@
                             <a href="{{ route('ticket-visualizer') }}"
                                 class="block w-full text-center bg-green-700 hover:bg-green-800 text-white font-bold py-2 px-4 border border-green-800 transition-colors">
                                 Acceder al Panel
-                            </a>
-                            @else
-                            <button disabled
-                                class="w-full bg-gray-400 text-gray-600 font-bold py-2 px-4 border border-gray-500 cursor-not-allowed">
-                                Acceso Restringido
-                            </button>
-                            @endif
-                        </div>
-                    </div>
-
-                    <!-- Módulo de Administración -->
-                    <div class="bg-white border border-gray-300 shadow hover:shadow-lg transition-shadow">
-                        <div class="px-6 py-3 bg-gray-700 border-b border-gray-800">
-                            <h3 class="text-lg font-bold text-white">Administración</h3>
-                        </div>
-                        <div class="p-6 space-y-4">
-                            <p class="text-gray-700 text-sm">
-                                Acceso al panel administrativo para gestionar usuarios, roles, permisos y configuración del sistema.
-                            </p>
-                            <ul class="text-gray-600 text-sm space-y-2">
-                                <li class="flex items-center gap-2">
-                                    <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
-                                    Gestión de usuarios y roles
-                                </li>
-                                <li class="flex items-center gap-2">
-                                    <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
-                                    Configuración del panel
-                                </li>
-                                <li class="flex items-center gap-2">
-                                    <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
-                                    Reportes y métricas
-                                </li>
-                            </ul>
-                            @if (Auth::check() && Auth::user()->hasRole(config('filament-spatie-roles-permissions.super_admin_role_name', 'Super Admin')))
-                            <a href="/admin"
-                                class="block w-full text-center bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 border border-gray-800 transition-colors">
-                                Ir al Panel
                             </a>
                             @else
                             <button disabled

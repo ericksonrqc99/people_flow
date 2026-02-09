@@ -1,8 +1,11 @@
+**The system may fail if your time zone is not correctly configured.**
+
 # REQUIRED
 * Bun
 * Laravel
 * Php
 * Composer
+
 # INSTALLATION
 
 *be at the root of the project*  

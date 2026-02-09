@@ -260,10 +260,49 @@ class CitizenResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->action(function (Citizen $record) {
+                        if ($record->tickets()->exists()) {
+                            Notification::make()
+                                ->danger()
+                                ->title('No se pudo eliminar')
+                                ->body('El ciudadano "' . $record->names . ' ' . $record->first_surname . '" tiene tickets asociados.')
+                                ->send();
+                            return;
+                        }
+
+                        $record->delete();
+
+                        Notification::make()
+                            ->success()
+                            ->title('Ciudadano eliminado')
+                            ->body('El ciudadano "' . $record->names . ' ' . $record->first_surname . '" fue eliminado correctamente.')
+                            ->send();
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->action(function ($records) {
+                            $records->each(function (Citizen $record) {
+                                if ($record->tickets()->exists()) {
+                                    Notification::make()
+                                        ->danger()
+                                        ->title('No se pudo eliminar')
+                                        ->body('El ciudadano "' . $record->names . ' ' . $record->first_surname . '" tiene tickets asociados.')
+                                        ->send();
+                                    return;
+                                }
+
+                                $record->delete();
+
+                                Notification::make()
+                                    ->success()
+                                    ->title('Ciudadano eliminado')
+                                    ->body('El ciudadano "' . $record->names . ' ' . $record->first_surname . '" fue eliminado correctamente.')
+                                    ->send();
+                            });
+                        }),
                 ]),
             ]);
     }

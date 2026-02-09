@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Http\Responses\LoginResponse;
 use App\Models\User;
+use Filament\Http\Responses\Auth\Contracts\LoginResponse as LoginResponseContract;
 use Filament\Support\Assets\Js;
 use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Support\Carbon;
@@ -17,7 +19,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(LoginResponseContract::class, LoginResponse::class);
     }
 
     /**
@@ -27,6 +29,10 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::before(function (User $user, string $ability) {
             return $user->isSuperAdmin() ? true : null;
+        });
+
+        Gate::define('any-permission', function ($user) {
+            return $user->getAllPermissions()->isNotEmpty();
         });
 
         Livewire::component('filament.pages.auth.login', \App\Filament\Pages\Auth\Login::class);

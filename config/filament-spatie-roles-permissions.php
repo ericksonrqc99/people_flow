@@ -211,9 +211,10 @@ return [
          */
         'custom_permissions' => [
             //'view-log'
-            'Ver Panel De Tickets',
+            'Ver Panel de Tickets',
             'Ver Modulo de Tickets',
-            "Ver Boton llamar en Panel de Tickets",
+            'Ver Boton llamar en Panel de Tickets',
+            'Ver Panel Administrativo',
         ],
 
         'user_model' => \App\Models\User::class,

@@ -43,7 +43,21 @@ class EditUser extends EditRecord
         $superAdminEmail = env('SUPER_ADMIN_EMAIL', 'super-admin@munisanmiguel-sanroman.gob.pe');
         
         if ($record->email !== $superAdminEmail) {
-            $actions[] = Actions\DeleteAction::make();
+            $actions[] = Actions\DeleteAction::make()
+                ->before(function (Actions\DeleteAction $action) {
+                    $record = $this->getRecord();
+
+                    if (\App\Models\Ticket::where('registered_by_id', $record->id)->exists()
+                        || \App\Models\Ticket::where('attended_by_id', $record->id)->exists()) {
+                        Notification::make()
+                            ->danger()
+                            ->title('No se pudo eliminar')
+                            ->body('El usuario "' . $record->name . '" tiene tickets asociados.')
+                            ->send();
+
+                        $action->cancel();
+                    }
+                });
         }
         
         return $actions;

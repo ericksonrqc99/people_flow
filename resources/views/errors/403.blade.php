@@ -28,7 +28,7 @@
             <div class="p-6 space-y-6">
                 <!-- Mensaje Principal -->
                 <div>
-                    <p class="text-base text-gray-700 mb-3">
+                    <p class="text-xl font-bold text-gray-700 mb-3">
                         No tienes permisos suficientes para acceder a esta página.
                     </p>
                     <p class="text-sm text-gray-600">

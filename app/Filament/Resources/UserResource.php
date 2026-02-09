@@ -10,6 +10,7 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Resources\Resource;
+use Filament\Notifications\Notification;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -103,7 +104,7 @@ class UserResource extends Resource
                             ->helperText('Área departamental donde labora el usuario'),
                     ]),
 
-                Forms\Components\Fieldset::make('Permisos y Roles')
+                Forms\Components\Fieldset::make('Asignación de Roles')
                     ->columns(1)
                     ->schema([
                         Forms\Components\Select::make('roles')
@@ -163,9 +164,8 @@ class UserResource extends Resource
                     ->badge()
                     ->color('secondary')
                     ->icon('heroicon-m-shield-check')
-                    ->separator(', ')
                     ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->listWithLineBreaks(),
                 Tables\Columns\TextColumn::make('is_active')
                     ->label(__('Estado'))
                     ->badge()
@@ -198,17 +198,54 @@ class UserResource extends Resource
                 Tables\Actions\DeleteAction::make()
                     ->visible(function (User $record): bool {
                         $superAdminEmail = env('SUPER_ADMIN_EMAIL', 'super-admin@munisanmiguel-sanroman.gob.pe');
-                        // No mostrar delete para super admin (ya está filtrado el usuario logueado en la tabla)
                         return $record->email !== $superAdminEmail;
+                    })
+                    ->action(function (User $record) {
+                        if (\App\Models\Ticket::where('registered_by_id', $record->id)->exists()
+                            || \App\Models\Ticket::where('attended_by_id', $record->id)->exists()) {
+                            Notification::make()
+                                ->danger()
+                                ->title('No se pudo eliminar')
+                                ->body('El usuario "' . $record->name . '" tiene tickets asociados.')
+                                ->send();
+                            return;
+                        }
+
+                        $record->delete();
+
+                        Notification::make()
+                            ->success()
+                            ->title('Usuario eliminado')
+                            ->body('El usuario "' . $record->name . '" fue eliminado correctamente.')
+                            ->send();
                     }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                        ->before(function ($records) {
+                        ->action(function ($records) {
                             $superAdminEmail = env('SUPER_ADMIN_EMAIL', 'super-admin@munisanmiguel-sanroman.gob.pe');
-                            // Filtrar para remover al super admin de la selección (el usuario logueado ya está filtrado)
-                            return $records->filter(fn($record) => $record->email !== $superAdminEmail);
+                            $records->each(function (User $record) use ($superAdminEmail) {
+                                if ($record->email === $superAdminEmail) return;
+
+                                if (\App\Models\Ticket::where('registered_by_id', $record->id)->exists()
+                                    || \App\Models\Ticket::where('attended_by_id', $record->id)->exists()) {
+                                    Notification::make()
+                                        ->danger()
+                                        ->title('No se pudo eliminar')
+                                        ->body('El usuario "' . $record->name . '" tiene tickets asociados.')
+                                        ->send();
+                                    return;
+                                }
+
+                                $record->delete();
+
+                                Notification::make()
+                                    ->success()
+                                    ->title('Usuario eliminado')
+                                    ->body('El usuario "' . $record->name . '" fue eliminado correctamente.')
+                                    ->send();
+                            });
                         }),
                 ]),
             ]);

@@ -172,17 +172,17 @@ class TicketResource extends Resource
             ->deferLoading()
             ->defaultSort('created_at', 'desc')
             ->columns([
-                Tables\Columns\TextColumn::make('code')
-                    ->label('Código Interno')
-                    ->badge()
-                    ->color('gray')
-                    ->icon('heroicon-m-hashtag')
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('visible_code')
                     ->label('Código Visible')
                     ->badge()
                     ->color('primary')
                     ->icon('heroicon-m-ticket')
+                    ->tooltip(function ($record): ?string {
+                        $internalCode = $record->code;
+                        if (!$internalCode) return null;
+
+                        return $internalCode;
+                    })
                     ->searchable(),
                 Tables\Columns\TextColumn::make('area.name')
                     ->label('Área')
@@ -205,9 +205,7 @@ class TicketResource extends Resource
                         $citizen = $record->citizen;
                         if (!$citizen) return null;
 
-                        return "Documento: " . ($citizen->document_number ?? 'N/A') . "\n" .
-                            "Teléfono: " . ($citizen->phone ?? 'N/A') . "\n" .
-                            "Email: " . ($citizen->email ?? 'N/A');
+                        return "Documento: " . ($citizen->document_number ?? 'N/A');
                     })
                     ->icon('heroicon-m-user-circle')
                     ->iconColor('gray'),
@@ -268,11 +266,7 @@ class TicketResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
+            ->bulkActions([]);
     }
 
     public static function getRelations(): array

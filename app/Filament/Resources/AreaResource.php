@@ -49,10 +49,11 @@ class AreaResource extends Resource
                     ->columns(2)
                     ->schema([
                         Forms\Components\TextInput::make('code')
-                            ->label(__('Código Correlativo'))
-                            ->readOnly()
-                            ->disabled()
-                            ->helperText('Identificador único asignado automáticamente por el sistema'),
+                            ->label(__('Código'))
+                            ->required()
+                            ->maxLength(100)
+                            ->placeholder('Ej: OGA, OGAC')
+                            ->helperText('Código corto identificador del área'),
                         Forms\Components\Select::make('type_id')
                             ->label(__('Tipo'))
                             ->relationship(
@@ -74,6 +75,13 @@ class AreaResource extends Resource
                             ->maxLength(100)
                             ->placeholder('Ingresa el nombre del área')
                             ->helperText('Nombre descriptivo y único del área dentro de la organización')
+                            ->columnSpanFull(),
+                        Forms\Components\TextInput::make('short_name')
+                            ->label(__('Nombre Corto'))
+                            ->required()
+                            ->maxLength(100)
+                            ->placeholder('Ej: ADMINISTRACION')
+                            ->helperText('Nombre abreviado del área')
                             ->columnSpanFull(),
                         Forms\Components\Textarea::make('description')
                             ->label(__('Descripción'))
@@ -167,22 +175,27 @@ class AreaResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()->action(function ($data, Area $record) {
-                    if ($record->users()->exists()) {
+                    $dependencies = [];
+                    if ($record->children()->exists()) $dependencies[] = 'sub-áreas';
+                    if ($record->users()->exists()) $dependencies[] = 'usuarios';
+                    if ($record->tickets()->exists()) $dependencies[] = 'tickets';
+
+                    if (!empty($dependencies)) {
                         Notification::make()
                             ->danger()
                             ->title(__('No se pudo eliminar'))
-                            ->body(__("El area $record->name está siendo usada"))
+                            ->body(__("El área \"$record->name\" tiene " . implode(', ', $dependencies) . ' asociados.'))
                             ->send();
                         return;
                     }
 
+                    $record->delete();
+
                     Notification::make()
                         ->success()
-                        ->title(__('Area eliminada'))
-                        ->body(__("El area $record->name fué eliminada"))
+                        ->title(__('Área eliminada'))
+                        ->body(__("El área \"$record->name\" fue eliminada correctamente."))
                         ->send();
-
-                    $record->delete();
                 }),
             ])
             ->bulkActions([
@@ -190,20 +203,27 @@ class AreaResource extends Resource
                     Tables\Actions\DeleteBulkAction::make()
                         ->action(
                             fn(Collection $records) => $records->each(function (Area $record) {
-                                if ($record->users()->exists()) {
-                                    return Notification::make()
+                                $dependencies = [];
+                                if ($record->children()->exists()) $dependencies[] = 'sub-áreas';
+                                if ($record->users()->exists()) $dependencies[] = 'usuarios';
+                                if ($record->tickets()->exists()) $dependencies[] = 'tickets';
+
+                                if (!empty($dependencies)) {
+                                    Notification::make()
                                         ->danger()
                                         ->title(__('No se pudo eliminar'))
-                                        ->body(__("El area $record->name está siendo usada"))
+                                        ->body(__("El área \"$record->name\" tiene " . implode(', ', $dependencies) . ' asociados.'))
                                         ->send();
+                                    return;
                                 }
-                                Notification::make()
-                                    ->success()
-                                    ->title(__('Area eliminada'))
-                                    ->body(__("El area $record->name fué eliminada"))
-                                    ->send();
 
                                 $record->delete();
+
+                                Notification::make()
+                                    ->success()
+                                    ->title(__('Área eliminada'))
+                                    ->body(__("El área \"$record->name\" fue eliminada correctamente."))
+                                    ->send();
                             })
                         ),
                 ]),
